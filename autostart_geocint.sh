@@ -4,16 +4,16 @@
 . ~/config.inc.sh
 export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME PRIVATE_MAKE_NAME OSM_MAKE_NAME 
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE ALL_TARGETS RUN_TARGETS
-export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI PGDATABASE
+export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI PGDATABASE TO_INSTALL
+export TARGET_TO_CLEAN RM_DIRECTORIES CLEAN_OPTIONALLY
 
 cleanup() {
   rm -f ~/$GENERAL_FOLDER/make.lock
 }
 
-# Install / upgrade the python libs
-sudo pip3 install slackclient
-sudo pip3 install https://github.com/konturio/make-profiler/archive/master.zip
-sudo pip3 install pandas
+# Compose makefiles to one pipeline
+echo "$TO_INSTALL" >> ~/$GENERAL_FOLDER/Makefile
+sh ~/geocint-runner/install.sh
 
 mkdir -p ~/$GENERAL_FOLDER
 
@@ -65,12 +65,17 @@ cp -r ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER
 cp -r ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER
 
 # Compose makefiles to one pipeline
-echo "include $OSM_MAKE_NAME $PRIVATE_MAKE_NAME" >> $GENERAL_FOLDER/Makefile
-#echo "include $private_make_name" >> geocint/Makefile
+echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
+	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
+	rm -rf $RM_DIRECTORIES
+	profile_make_clean $TARGET_TO_CLEAN
+	$CLEAN_OPTIONALLY" >> ~/$GENERAL_FOLDER/Makefile
+echo "include $OSM_MAKE_NAME $PRIVATE_MAKE_NAME" >> ~/$GENERAL_FOLDER/Makefile
+
 
 # Include targets into all tagret dependencies
-sed -i "1s/.*/export PGDATABASE = $PGDATABASE/" $GENERAL_FOLDER/Makefile
-sed -i "4s/.*/all\: $ALL_TARGETS \#\# final target/" $GENERAL_FOLDER/Makefile
+sed -i "1s/.*/export PGDATABASE = $PGDATABASE/" ~/$GENERAL_FOLDER/Makefile
+sed -i "4s/.*/all\: $ALL_TARGETS \#\# final target/" ~/$GENERAL_FOLDER/Makefile
 
 profile_make clean
 
