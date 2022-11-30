@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Installing make-profiler
 sudo apt install -y python3-pip graphviz gawk
 sudo pip3 install slack slackclient
