@@ -54,21 +54,20 @@ sudo echo 'export PATH=$PATH:/usr/local/pgsql/bin' >> /root/.bashrc
 sudo pgxn install h3
 
 # gis user setup
-sudo usermod -aG adm gis
-sudo usermod -aG gis www-data
-sudo mkdir -p ~gis/{public_html,domlogs}
-sudo chown root:gis ~gis/domlogs
-sudo chown gis:gis ~gis/public_html
-sudo chmod 0750 ~gis/{public_html,domlogs}
-sudo su gis -c "echo 'export PATH=\$PATH:/usr/local/pgsql/bin' >> /home/gis/.bashrc"
+# sudo usermod -aG adm gis
+# sudo usermod -aG gis www-data
+# sudo mkdir -p ~gis/{public_html,domlogs}
+# sudo chown root:gis ~gis/domlogs
+# sudo chown gis:gis ~gis/public_html
+# sudo chmod 0750 ~gis/{public_html,domlogs}
+# sudo su gis -c "echo 'export PATH=\$PATH:/usr/local/pgsql/bin' >> /home/gis/.bashrc"
 
-sudo psql -c "create extension postgis;"
-sudo psql -c "create extension postgis_raster;"
-sudo psql -c "create extension postgis_sfcgal;"
-sudo psql -c "create extension postgis_topology;"
-sudo psql -c "create extension h3;"
-sudo psql -c "create extension h3_postgis;"
-
+# sudo psql -c "create extension postgis;"
+# sudo psql -c "create extension postgis_raster;"
+# sudo psql -c "create extension postgis_sfcgal;"
+# sudo psql -c "create extension postgis_topology;"
+# sudo psql -c "create extension h3;"
+# sudo psql -c "create extension h3_postgis;"
 
 # Ubuntu Postgres stuff
 sudo apt install -y postgresql-common
