@@ -56,7 +56,7 @@ if [ "$UPDATE_PRIVATE" = "true" ]; then
 fi
 
 # Remove from general folder all files and folders except data and db
-rm -fr ~/$GENERAL_FOLDER/!(d*)/
+find . -type d -not -name  "d*" -not -name '*.*' | xargs rm -r
 find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 
 # Copy files from repositories to general folder
