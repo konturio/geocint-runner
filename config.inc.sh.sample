@@ -1,0 +1,49 @@
+# general variables
+# variable to store additional paths, that should be added to PATH variable
+PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
+# directory for pipeline execution 
+GENERAL_FOLDER=geocint
+# directories that should be added to env
+OPTIONAL_DIRECTORIES='.'
+# name of your private repositry
+PRIVATE_REPO_NAME=geocint-private
+# name of makefile from your private repositry
+PRIVATE_MAKE_NAME=private_make
+# name of makefile from geocint-openstreetmap repositry
+OSM_MAKE_NAME=osm_make
+
+# updates block
+# set to true to pull geocint-runner repo before each run
+UPDATE_RUNNER=false
+# set to true to pull geocint-openstreetmap repo before each run
+UPDATE_OSM_LOGIC=false
+# set to true to pull your repo before each run
+UPDATE_PRIVATE=true
+
+# targets block
+# list of dependencies for target "all"
+ALL_TARGETS='db/table/osm'
+# list of targets that will be runned
+RUN_TARGETS='your_final_target'
+
+# slack integration
+# name of slack channel for sending messages from pipeline
+SLACK_CHANNEL='Your_slack_channel'
+# name of slack bot for sending messages from pipeline
+SLACK_BOT_NAME='Your bot name'
+# name of slack emoji that will be used as bot's avatar for sending messages from pipeline
+SLACK_BOT_EMOJI='cat'
+
+# database
+# name of postgresql database
+PGDATABASE='test'
+
+# additional instalation
+# additional packages that should be installed
+TO_INSTALL='sudo pip3 install geopandas'
+
+# clear target - Cleans the worktree for next nightly run. Does not clean non-repeating targets.
+RM_DIRECTORIES='data/planet-is-broken'
+TARGETS_TO_CLEAN='data/planet-latest-updated.osm.pbf'
+CLEAN_OPTIONALLY='# Clean docker images
+	docker image prune --force --filter label=stage=your-docker-image
