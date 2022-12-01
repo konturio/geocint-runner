@@ -46,4 +46,4 @@ TO_INSTALL='sudo pip3 install geopandas'
 RM_DIRECTORIES='data/planet-is-broken'
 TARGETS_TO_CLEAN='data/planet-latest-updated.osm.pbf'
 CLEAN_OPTIONALLY='# Clean docker images
-	docker image prune --force --filter label=stage=your-docker-image
+	docker image prune --force --filter label=stage=your-docker-image'

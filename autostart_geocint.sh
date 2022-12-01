@@ -33,7 +33,7 @@ echo "Geocint pipeline is starting nightly build!" | python3 ~/geocint-runner/sc
 # make.lock is a file which exists while pipeline running
 # if make.lock exists, pipeline should not be started
 if [ -e make.lock ]; then
-  echo "Skip start: running pipeline is not done yet." | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+  echo "Skip start: running pipeline is not done yet." | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
   exit 1
 fi
 
@@ -56,7 +56,7 @@ if [ "$UPDATE_PRIVATE" = "true" ]; then
 fi
 
 # Remove from general folder all files and folders except data and db
-find . -type d -not -name  "d*" -not -name '*.*' | xargs rm -r
+find ~/$GENERAL_FOLDER/. -type d -not -name  "d*" -not -name '*.*' | xargs rm -rf
 find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 
 # Copy files from repositories to general folder
