@@ -62,13 +62,6 @@ sudo pgxn install h3
 # sudo chmod 0750 ~gis/{public_html,domlogs}
 # sudo su gis -c "echo 'export PATH=\$PATH:/usr/local/pgsql/bin' >> /home/gis/.bashrc"
 
-# sudo psql -c "create extension postgis;"
-# sudo psql -c "create extension postgis_raster;"
-# sudo psql -c "create extension postgis_sfcgal;"
-# sudo psql -c "create extension postgis_topology;"
-# sudo psql -c "create extension h3;"
-# sudo psql -c "create extension h3_postgis;"
-
 # Ubuntu Postgres stuff
 sudo apt install -y postgresql-common
 

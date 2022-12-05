@@ -69,7 +69,7 @@ echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean
 	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
 	rm -rf $RM_DIRECTORIES
 	profile_make_clean $TARGET_TO_CLEAN
-	$CLEAN_OPTIONALLY" >> ~/$GENERAL_FOLDER/Makefile
+	$CLEAN_OPTIONALLY"
 echo "include $OSM_MAKE_NAME $PRIVATE_MAKE_NAME" >> ~/$GENERAL_FOLDER/Makefile
 
 
