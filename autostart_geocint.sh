@@ -4,16 +4,16 @@
 . ~/config.inc.sh
 export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME PRIVATE_MAKE_NAME OSM_MAKE_NAME 
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE ALL_TARGETS RUN_TARGETS
-export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI PGDATABASE TO_INSTALL
+export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI PGDATABASE
 export TARGET_TO_CLEAN RM_DIRECTORIES CLEAN_OPTIONALLY
 
 cleanup() {
   rm -f ~/$GENERAL_FOLDER/make.lock
 }
 
-# Compose makefiles to one pipeline
-echo "$TO_INSTALL" >> ~/$GENERAL_FOLDER/Makefile
-sh ~/geocint-runner/install.sh
+sh ~/geocint-runner/runner-install.sh || echo 'runner-install.sh returned an error, check logs for more infornation' | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+sh ~/geocint-openstreetmap/openstreetmap-install.sh || echo 'openstreetmap-install.sh returned an error, check logs for more infornation' | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+sh ~/$PRIVATE_REPO_NAME/install.sh || echo 'install.sh returned an error, check logs for more infornation' | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 
 mkdir -p ~/$GENERAL_FOLDER
 
