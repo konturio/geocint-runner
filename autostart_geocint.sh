@@ -77,7 +77,7 @@ rm -r ~/files_shouldnt_be_copy
 
 sed -i '/^nohup/d' ~/nohup.out
 
-nohup_length="$(cat ~/nohup.out | wc -l)"
+nohup_length="$(grep -cve '^\s*$' ~/nohup.out | wc -l)"
 
 if [ $nohup_length -eq 0 ]
 then
