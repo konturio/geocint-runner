@@ -60,9 +60,30 @@ find ~/$GENERAL_FOLDER/. -type d -not -name  "d*" -not -name '*.*' | xargs rm -r
 find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 
 # Copy files from repositories to general folder
-cp -r ~/geocint-runner/* ~/$GENERAL_FOLDER
-cp -r ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER
-cp -r ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER
+# move readme files to temporary dir to exclude them from copying process
+mkdir -p ~/files_shouldnt_be_copy
+mv ~/geocint-openstreetmap/README.md ~/files_shouldnt_be_copy/osm_readme.md
+mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
+
+rm -f nohup.out
+nohup cp -ia ~/geocint-runner/* ~/$GENERAL_FOLDER 2>~/nohup.out
+nohup cp -ia ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER 2>~/nohup.out
+nohup cp -ia ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER 2>~/nohup.out
+
+# move readme back after copying process
+mv ~/files_shouldnt_be_copy/osm_readme.md ~/geocint-openstreetmap/README.md 
+mv ~/files_shouldnt_be_copy/private_readme.md ~/$PRIVATE_REPO_NAME/README.md
+rm -r ~/files_shouldnt_be_copy
+
+nohup_length="$(cat ~/nohup.out | wc -l)"
+
+if [ $nohup_length -lt 2 ]
+then
+  echo "Copy from geocint-runner, geocint-openstreetmap and $PRIVATE_REPO_NAME to geocint folder completed successfully"
+else
+  echo "Duplicate files were found while copying files to a geocint folder: $(sed 1d ~/nohup.out)" | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+  exit
+fi
 
 # Compose makefiles to one pipeline
 echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
