@@ -79,7 +79,7 @@ nohup_length="$(cat ~/nohup.out | wc -l)"
 
 if [ $nohup_length -lt 2 ]
 then
-  echo "Copy from geocint-runner, geocint-openstreetmap and $PRIVATE_REPO_NAME to geocint folder completed successfully"
+  echo "Copy from geocint-runner, geocint-openstreetmap and $PRIVATE_REPO_NAME to geocint folder completed successfully" | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 else
   echo "Duplicate files were found while copying files to a geocint folder: $(sed 1d ~/nohup.out)" | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
   exit
