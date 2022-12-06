@@ -56,8 +56,8 @@ if [ "$UPDATE_PRIVATE" = "true" ]; then
   cd ~/$PRIVATE_REPO_NAME; git pull --rebase --autostash || { git stash && git pull && echo 'git rebase autostash $PRIVATE_REPO_NAME failed, stash and pull executed' | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI; }
 fi
 
-# Remove from general folder all files and folders except data, db and deploy
-find ~/$GENERAL_FOLDER/. -type d -not -name  "d*" -not -name '*.*' | xargs rm -rf
+# Remove from general folder all files and folders except data, db, deploy and logs
+find ~/$GENERAL_FOLDER/. -type d -not -name  "d*" -not -name '*.*' -not -name  "logs" | xargs rm -rf
 find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 
 # Copy files from repositories to general folder
