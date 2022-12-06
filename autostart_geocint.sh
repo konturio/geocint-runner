@@ -65,7 +65,7 @@ mkdir -p ~/files_shouldnt_be_copy
 mv ~/geocint-openstreetmap/README.md ~/files_shouldnt_be_copy/osm_readme.md
 mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
 
-rm -f nohup.out
+rm -f ~/nohup.out
 nohup cp -ia ~/geocint-runner/* ~/$GENERAL_FOLDER 2>>~/nohup.out
 nohup cp -ia ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER 2>>~/nohup.out
 nohup cp -ia ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER 2>>~/nohup.out
