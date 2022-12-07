@@ -53,7 +53,7 @@ data/out/fire_stations: | data/out ## Create folder for data extraction
 	mkdir -p $@
 
 data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz: db/table/fire_stations_h3_r8_count | data/out/fire_stations ## Extract from postgresql folder to gpkg file
-	# remove filex if exist to avaoid conflict
+	# remove filex if exist to avoid conflict
 	rm -f $@
 	rm -f data/out/fire_stations/fire_stations_h3_r8_count.gpkg
 	# extract data to gpkg file

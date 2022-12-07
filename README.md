@@ -45,7 +45,7 @@ Geocint consists from 3 different parts:
 - [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking dependencies, cleaning targets and
   posting info messages
 - [runner_install.sh](runner_install.sh) - script, that runs installation of dependencies of geocint-runner part
-- [congig.inc.sh.sample](config.inc.sh.sample) - sample config file
+- [config.inc.sh.sample](config.inc.sh.sample) - sample config file
 - [Makefile](Makefile) - maps dependencies between generation stages
 - [your_make.sample](your_make.sample) - sample make file that shows how to integrate geocint-runner and 
 geocint-openstreetmap parts with your own targets
