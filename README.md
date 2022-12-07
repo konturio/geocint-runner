@@ -2,7 +2,7 @@
 
 ## geocint processing pipeline
 
-Geocint is is an open source Kontur's geodata ETL/CI/CD pipeline designed for ease of maintenance and high single-node throughput. Writing
+Geocint is an open source Kontur's geodata ETL/CI/CD pipeline designed for ease of maintenance and high single-node throughput. Writing
 the code as Geocint target makes sure that it is fully recorded, can be run autonomously, can be inspected, reviewed and
 tested by other team members, and will automatically produce new artifacts once new input data comes in.
 
@@ -54,6 +54,7 @@ geocint-openstreetmap parts with your own targets
 - [scripts/](scripts) - scripts that perform transformation on top of table without creating new one
 - [tables/](tables) - SQL that generates a table named after the script
 - [static_data] - static file-based data stored in geocint repository
+
 Сreated automatically when launching targets
 - [data/](data) - file-based input and output data 
     - data/in - all input data, downloaded elsewhere
@@ -73,19 +74,19 @@ Your repository should contain next required files:
 - your_make (use [private_make.sample](your_make.sample) as an example; take at look that make shouldn't be named "Makefile",
 use another one name to keep compatibility with geocint-runner repository)
 
-2.Create a new user with sudo permisions (dufault user is gis).
+2. Create a new user with sudo permisions (dufault user is gis).
 Take at look, that the best practise is to use this user name for creation postgres role and database.
 Path ~/ is an equivalent to /home/your_user/. This folder is a working directory for geocint pipeline.
 
-2. Clone 3 repository (geocint-runner, geocint-openstreetmap, your repo) to ~/ 
+3. Clone 3 repository (geocint-runner, geocint-openstreetmap, your repo) to ~/ 
 
-3. Copy [congig.inc.sh.sample](config.inc.sh.sample) from geocint-runner to root and set variables:
+4. Copy [congig.inc.sh.sample](config.inc.sh.sample) from geocint-runner to root and set variables:
 ```shell
   cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
 ```
   set necessary values of variables.
 
-4. Add slack integrations:
+5. Add slack integrations:
   * install pip - 
 ```shell
 sudo apt install -y python3-pip
@@ -100,18 +101,18 @@ sudo pip3 install slack slackclient
 ```
   * echo "Test slack integration" | python3 scripts/slack_message.py your_slack_channel your_server raccoon
 
-5. Set crontab for autostarting pipeline
+6. Set crontab for autostarting pipeline
   * add SLACK_KEY=your_slack_integration_key to crontab settings, to avoid errors when slack_key doesn't exist
   * setif you want to run your pipeline at half past 5 am add this row:
   * /5 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
   * Take a look that time on your local mashine and on your server can be different (thorough time belts).
 
-6. Run ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
+7. Run ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
 
-7. Add connection settings to the pg_hba.conf
+8. Add connection settings to the pg_hba.conf
 `local   gis +geocint_users  trust`
 
-6. Greate postgres role and create postgresql extensions:
+9. Greate postgres role and create postgresql extensions:
 ```shell
     sudo -u postgres psql
     create role gis login;
@@ -125,7 +126,7 @@ sudo pip3 install slack slackclient
     create extension h3_postgis;
     -- create any additional extension, that you need
 ```
-7. Run pipeline manually, or set necessary time in crontab
+10. Run pipeline manually, or set necessary time in crontab
 ```shell
     /bin/bash /home/gis/geocint-runner/autostart_geocint.sh > /home/gis/geocint/log.txt
 ```
@@ -134,7 +135,7 @@ sudo pip3 install slack slackclient
 
 #### Things to avoid:
 
-- Don't create files with the same name and the same nesting level as files in geocint-runner and geocint-openstreetmap 
+- Files with the same name and the same nesting level as files in geocint-runner and geocint-openstreetmap 
 repositories. This does not apply to folders.
 - Views and materialized views.
 - Complex python scripts should become less complex bash+sql scripts.
@@ -193,7 +194,7 @@ export SLACK_KEY=<your_key>
 User schemas can be used to separation pipeline and dev data.
 Run [scripts/create_geocint_user.sh](scripts/create_geocint_user.sh) to initialize the user schema.
 
-`scripts/create_geocint_user.sh [username]`
+`sudo scripts/create_geocint_user.sh [username]`
 
 Script for adding user role and schema to geocint database. If no username is provided, it will be prompted. User roles
 are added to the geocint_users group role. You need to add the following line to pg_hba.conf.
