@@ -16,8 +16,7 @@ Geocint consists from 3 different parts:
 
 ### Technology stack is:
 
-- Huge bare metal machine. High CPU count, high memory, large industrial SSD. All further stack is tuned for this
-  specific machine, not some abstract one. OS is latest Ubuntu version (not necessarily LTS).
+- high performance computer. OS is latest Ubuntu version (not necessarily LTS).
 - Bash (linux shell) for scripting one-liners that get data into the database for further processing, or get data out of
   the database for deployment. https://tldp.org/LDP/abs/html/
 - GNU Make as job server. We do not use advanced features like variables and wildcards, using simple explicit
