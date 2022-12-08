@@ -126,7 +126,7 @@ sudo pip3 install slack slackclient
 ```
 10. Run the pipeline manually, or set the necessary time in crontab
 ```shell
-    /bin/bash /home/gis/geocint-runner/autostart_geocint.sh > /home/gis/geocint/log.txt
+    /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 ```
 
 ### Geocint deployment best practices:
