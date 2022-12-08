@@ -1,0 +1,82 @@
+## --------------- SAMPLE TARGET CHAIN -------------------
+
+## This is an example makefile created to demonstrate how to create and use targets as part of the ETL process.
+
+## --------------- DATA PROCESSING BLOCK ----------------
+
+db/table/fire_stations: db/index/osm_tags_idx ## Extract centroids of fire stations from osm table
+	# db/index/osm_tags_idx is a dependency from geocint-openstreetmap Makefile
+	# drop table if exist to avoid conflict
+	psql -c "drop table if exists fire_stations;"
+	# extract fire stations from the osm table to the new table
+	# you can move such a big query to a separate SQL file like tables/fire_station.sql
+	# and execute them with psql -f tables/fire_station.sql
+	# We run them from makefile just to keep the sample in one file
+	psql -c "create table fire_stations as ( \
+					select  osm_id, \
+							tags ->> 'amenity' "type", \
+							ST_Centroid(geog::geometry) as geom \
+					from osm o \
+					where tags @> '{"amenity":"fire_station"}' \
+					order by osm_id \
+					);"
+	# update db/table/fire_stations time mark to be able to create the correct graph using make-profiler
+	touch $@
+
+db/table/fire_stations_h3_r8: db/table/fire_stations ## Create h3 8 resolution hexagons from centroids of fire stations 
+	psql -c "drop table if exists fire_stations_h3_r8;"
+	# generate h3 8 resolution hexes indexes and boundaries from geometry using h3_pg
+	# for more information see https://github.com/bytesandbrains/h3-pg
+	psql -c "create table fire_stations_h3_r8 as ( \
+					select  h3_lat_lng_to_cell(ST_Transform(geom, 4326)::point, 8) as h3, \
+							h3_cell_to_boundary_geometry(h3_lat_lng_to_cell(ST_Transform(geom, 4326)::point, 8)) as geom, \
+							osm_id, \
+							type \
+					from fire_stations \
+					);"
+	touch $@
+
+db/table/fire_stations_h3_r8_count: db/table/fire_stations_h3_r8 ## Count the number of fire stations for each hexagon
+	psql -c "drop table if exists fire_stations_h3_r8_count;"
+	# Count the number of fire stations for each hexagon
+	psql -c "create table fire_stations_h3_r8_count as ( \
+					select  count(h3) as fire_stations_number, \
+							h3, \
+							geom \
+					from fire_stations_h3_r8 \
+					group by 2,3 \
+					);"
+	touch $@
+
+## ---------------- DATA EXPORT BLOCK ----------------------
+
+data/out/fire_stations: | data/out ## Create folder for data extraction
+	# data/out is a dependency from geocint-runner Makefile
+	mkdir -p $@
+
+data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz: db/table/fire_stations_h3_r8_count | data/out/fire_stations ## Extract from database to compressed gpkg file
+	# remove file if exist to avoid conflict
+	rm -f $@
+	rm -f data/out/fire_stations/fire_stations_h3_r8_count.gpkg
+	# extract data to gpkg file
+	ogr2ogr -f GPKG data/out/fire_stations/fire_stations_h3_r8_count.gpkg \
+		PG:'dbname=gis' \
+		-sql "select fire_stations_number, h3, geom from fire_stations_h3_r8_count order by h3" \
+		-lco "SPATIAL_INDEX=NO"\
+		-nln fire_stations_h3
+	# compress the extracted file
+	cd data/out/fire_stations; pigz fire_stations_h3_r8_count.gpkg
+
+## ---------------- DATA DEPLOY BLOCK ----------------------
+
+deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz | deploy/s3 ## deploy/s3 is a dependency from geocint-runner Makefile
+	aws s3 cp data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz \
+		s3://your_s3_bucket/fire_stations_h3_r8_count.gpkg.gz \
+		--profile your_s3_profile \
+		--acl public-read
+	touch $@
+
+prod: deploy/s3/fire_stations ## Last target to prove that all targets chains were built
+	# Set this target as a value for the ALL_TARGETS parameter
+	echo "Prod target was built"
+	
