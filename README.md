@@ -144,7 +144,7 @@ repositories. This limitation does not apply to folders.
 - Make sure you have source data always available. Do not store it locally on geocint - add a target to download data
   from S3 at least.
 - Try to run the pipeline at least once on your test branch, or create a simple short makefile for test_* tables in a
-  separate a folder and run it, avoiding effect on running pipeline.
+  separate folder and run it, avoiding effect on running pipeline.
 
 #### Technical details for **code review** checks:
 
