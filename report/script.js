@@ -7,8 +7,7 @@ function filterTarget() {
     tr = table.getElementsByTagName("tr");
 
     if (filter.startsWith('"') && filter.endsWith('"')) {
-        filter = filter.substring(1);
-        filter = filter.substring(0, filter.length - 1)
+        filter = filter.substring(1, filter.length - 1)
         for (i = 0; i < tr.length; i++) {
             td = tr[i].getElementsByTagName("td")[0];
             if (td) {
