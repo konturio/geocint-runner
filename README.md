@@ -2,63 +2,63 @@
 
 ## geocint processing pipeline
 
-Geocint is an open source Kontur's geodata ETL/CI/CD pipeline designed for ease of maintenance and high single-node throughput. Writing
+Geocint is Kontur's open source geodata ETL/CI/CD pipeline designed for ease of maintenance and high single-node throughput. Writing
 the code as Geocint target makes sure that it is fully recorded, can be run autonomously, can be inspected, reviewed and
 tested by other team members, and will automatically produce new artifacts once new input data comes in.
 
 ### Geocint structure:
 
-Geocint consists from 3 different parts:
-- [geocint-runner](https://github.com/konturio/geocint-runner) - core part of pipeline, includes utilites and initial Makefile
-- [geocint-openstreetmap](https://github.com/konturio/geocint-runner) - chain of targets for downloading, updating and loading 
-  to database OpenStreetMap planet dump
+Geocint consists of from 3 different parts:
+- [geocint-runner](https://github.com/konturio/geocint-runner) - a core part of the pipeline, includes utilities and initial Makefile
+- [geocint-openstreetmap](https://github.com/konturio/geocint-runner) - a chain of targets for downloading, updating and uploading 
+to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
-### Technology stack is:
+### Technology stack:
 
-- high performance computer. OS is latest Ubuntu version (not necessarily LTS).
-- Bash (linux shell) for scripting one-liners that get data into the database for further processing, or get data out of
-  the database for deployment. https://tldp.org/LDP/abs/html/
-- GNU Make as job server. We do not use advanced features like variables and wildcards, using simple explicit
+- A high-performance computer. OS:the latest Ubuntu version (not necessarily LTS).
+- Bash (Linux shell) is used for scripting one-liners that get data into the database for further processing or get data out of the database for deployment. 
+https://tldp.org/LDP/abs/html/
+- GNU Make is used as job server. We do not use advanced features like variables and wildcards, using simple explicit
   "file-depends-on-file" mode. Make takes care of running different jobs concurrently whenever possible.
   https://makefiletutorial.com/
-- make-profiler is used as linter and preprocessor for Make that outputs network diagram of what is getting built when
+- make-profiler is used as linter and preprocessor for Make that outputs a network diagram of what is getting built when
   and why. The output chart allows to see what went wrong and quickly get to logs.
   https://github.com/konturio/make-profiler
-- Postgres (latest stable) for data manipulation. No replication, minimal WAL logging, disabled synchronous_commit
+- PostgreSQL (latest stable version) for data manipulation. No replication, minimal WAL logging, disabled synchronous_commit
   (fsync enabled!), parallel costs tuned to prefer parallel execution whenever possible. To facilitate debugging
-  auto_explain is enabled, you can find slow query plans in postgresql's log files. When you need to make it faster,
+  auto_explain is enabled, and you can find slow query plans in Postgres’ log files. log files. When you need to make it faster,
   follow https://postgrespro.ru/education/courses/QPT
-- GNU Parallel for paralleling tasks that cannot be effectively paralleled by Postgres, essentially parallel-enabled
+- GNU Parallel is used for paralleling tasks that cannot be effectively paralleled by Postgres, essentially parallel-enabled
   Bash. https://www.gnu.org/software/parallel/parallel.html
-- PostGIS (latest unreleased master) for geodata manipulation. Kontur has maintainers for PostGIS in team so you can
+- PostGIS (latest unreleased master) for geodata manipulation. Kontur has maintainers for PostGIS in the team so you can
   develop or ask for features directly. https://postgis.net/docs/manual-dev/reference.html
 - h3_pg for hexagon grid manipulation, https://github.com/bytesandbrains/h3-pg. When googling for manuals make sure you
   use this specific extension.
 - aws-cli is used to deploy data into s3 buckets or get inputs from there. https://docs.aws.amazon.com/cli/index.html
-- python3 for small tasks like unpivoting source data.
-- GDAL, OGR, osm-c-tools, osmium, and others are used as needed in Bash CLI.
+- python3 is used for small tasks like unpivoting source data.
+- GDAL, OGR, osm-c-tools, osmium, and others are used if they are needed in Bash CLI.
 
-### Directory and files structure:
+### Directory and file structure:
 
-- [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking dependencies, cleaning targets and
+- [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
   posting info messages
-- [runner_install.sh](runner_install.sh) - script, that runs installation of dependencies of geocint-runner part
+- [runner_install.sh](runner_install.sh) - script, that runs installation of required packages of geocint-runner part
 - [config.inc.sh.sample](config.inc.sh.sample) - sample config file
-- [Makefile](Makefile) - maps dependencies between generation stages
-- [your_make.sample](your_make.sample) - sample make file that shows how to integrate geocint-runner and 
-geocint-openstreetmap parts with your own targets
-- [functions/](functions) - service SQL functions, used in more than a single other file
-- [procedures/](procedures) - service SQL procedures, used in more than a single other file
-- [scripts/](scripts) - scripts that perform transformation on top of table without creating new one
-- [tables/](tables) - SQL that generates a table named after the script
+- [Makefile](Makefile) - map dependencies between data generation stages
+- [your_make.sample](your_make.sample) - sample make file that shows how to integrate geocint-runner, 
+geocint-openstreetmap and your own chains of targets
+- [functions/](functions) - service SQL functions, used in more than one other file
+- [procedures/](procedures) - service SQL procedures, used in more than one other file
+- [scripts/](scripts) - scripts that perform data transformation on top of table without creating new table
+- [tables/](tables) - SQL which generates a table with the same name as the script
 - [static_data] - static file-based data stored in geocint repository
 
 Сreated automatically when launching targets
 - [data/](data) - file-based input and output data 
     - data/in - all input data, downloaded elsewhere
     - data/in/raster - all downloaded geotiffs
-    - data/mid - all intermediate data (retiles, unpacks, reprojections and etc) which can removed after
+    - data/mid - all intermediate data (retiles, unpacks, reprojections and etc) which can be removed after
       each launch
     - data/out - all generated final data (tiles, dumps, unloading for the clients and etc)
 - [db/](db) - files - makefile mark about executing "db/..." targets
@@ -66,24 +66,23 @@ geocint-openstreetmap parts with your own targets
 
 ### How to install geocint
 
-1. Create your repository to store your own part of pupeline.
-Your repository should contain next required files:
-- README.md (could be empty, just make sure if it exists)
+1. Create your repository to store your own part of the pipeline.
+Your repository should contain the following required files:
+- README.md (could be empty, just make sure that it exists)
 - install.sh (use [runner_install.sh](runner_install.sh) as an example, store installation of your additional dependencies)
-- your_make (use [private_make.sample](your_make.sample) as an example; take at look that make shouldn't be named "Makefile",
-use another one name to keep compatibility with geocint-runner repository)
+- your_make (use [private_make.sample](your_make.sample) as an example; keep in mind that make shouldn't be named "Makefile",
+use the other name to keep compatibility with geocint-runner repository)
 
-2. Create a new user with sudo permisions (dufault user is gis).
-Take at look, that the best practise is to use this user name for creation postgres role and database.
-Path ~/ is an equivalent to /home/your_user/. This folder is a working directory for geocint pipeline.
+2. Create a new user with sudo permissions (the default user is "gis"). Keep in mind that the best practice is to use this user name 
+for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 
 3. Clone 3 repository (geocint-runner, geocint-openstreetmap, your repo) to ~/ 
 
-4. Copy [congig.inc.sh.sample](config.inc.sh.sample) from geocint-runner to root and set variables:
+4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to ~/ and set variables:
 ```shell
   cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
 ```
-  set necessary values of variables.
+  set the necessary values of variables.
 
 5. Add slack integrations:
   * install pip - 
@@ -102,16 +101,16 @@ sudo pip3 install slack slackclient
 
 6. Set crontab for autostarting pipeline
   * add SLACK_KEY=your_slack_integration_key to crontab settings, to avoid errors when slack_key doesn't exist
-  * setif you want to run your pipeline at half past 5 am add this row:
+  * set if you want to run your pipeline at half past 5 am add this row:
   * /5 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
-  * Take a look that time on your local mashine and on your server can be different (thorough time belts).
+  * Keep in mind that time on your local machine and on your server can be different.
 
 7. Run ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
 
 8. Add connection settings to the pg_hba.conf
 `local   gis +geocint_users  trust`
 
-9. Greate postgres role and create postgresql extensions:
+9. Create postgresql role and create postgresql extensions:
 ```shell
     sudo -u postgres psql
     create role gis login;
@@ -125,7 +124,7 @@ sudo pip3 install slack slackclient
     create extension h3_postgis;
     -- create any additional extension, that you need
 ```
-10. Run pipeline manually, or set necessary time in crontab
+10. Run the pipeline manually, or set the necessary time in crontab
 ```shell
     /bin/bash /home/gis/geocint-runner/autostart_geocint.sh > /home/gis/geocint/log.txt
 ```
@@ -135,27 +134,17 @@ sudo pip3 install slack slackclient
 #### Things to avoid:
 
 - Files with the same name and the same nesting level as files in geocint-runner and geocint-openstreetmap 
-repositories. This does not apply to folders.
+repositories. This limitation does not apply to folders.
 - Views and materialized views.
 - Complex python scripts should become less complex bash+sql scripts.
 - Comments for targets, containing double quote characters (")
 
 #### Organizational points:
 
-- Task and action plan is analyzed and you understand what you need to do. Remember, no code at all is always better.
 - Make sure you have source data always available. Do not store it locally on geocint - add a target to download data
   from S3 at least.
-- Store your commits on a remote repository: your laptop/pc could break anytime. Make regular commits under
-  **Draft** MR status
-- After your MR is ready, write about it to a suitable slack channel. Mention people who are able to review code and
-  approve it. Describe how did you test your code.
-- Try to run the pipeline at least once on your test branch, or create simple short makefile for test_* tables in
-  separate folder and run it, avoiding affect on running pipeline.
-- Add sources for download 3rd-party data
-- Before sending to QA or analysis make sure that you wrote 3 points at the task for the mr you have:
-    - summary what did you do
-    - info on how to test (general flow)
-    - some tips on what should be tested in your opinion and what part of the app can be affected.
+- Try to run the pipeline at least once on your test branch, or create a simple short makefile for test_* tables in
+  separate a folder and run it, avoiding effect on running pipeline.
 
 #### Technical details for **code review** checks:
 
@@ -166,22 +155,17 @@ repositories. This does not apply to folders.
     - try to use drop/alter database_object IF EXIST
 - Does your target need to be launched every day? Don’t forget to put it into the Clean one. Or make it manually
   (see Cache invalidation).
-- Check all dependencies twice.
-- Commands log level - will it generate lots of unnecessary info?
 - If you replace one target with another one, make sure to delete unused one everywhere (especially dev/prod targets)
-- Updates on tables should be a part of target, where this tables are created, for not updating smth twice.
+- Updates on tables should be a part of the target, where these tables are created, for not updating something twice.
 
 #### After-Merge duties. Share them and your progress with teammates.
 
-- Cache invalidation: manual clean of currently updated but existed targets
-- Delete local/S3 (how - link to instruction) files and DB objects that you don’t need anymore
-- Сheck periodically the make.svg after launch, maybe you can find out how to make a quick fix for not losing
-  a whole day before next launch.
-
+- Cache invalidation: manual clean of currently updated but existing targets
+- Delete local/S3 files and DB objects that you don’t need anymore
 
 ### Slack messages
 
-The geocint pipeline should send messages to the Slack channel. Create channel with name `geocint`, generate Slack token
+The geocint pipeline should send messages to the Slack channel. Create a channel, generate Slack token
 and store it in the `SLACK_KEY` variable in file `$HOME/.profile`.
 
 ```shell
@@ -190,7 +174,7 @@ export SLACK_KEY=<your_key>
 
 ### User schemas
 
-User schemas can be used to separation pipeline and dev data.
+User schemas can be used for separate pipeline and dev data.
 Run [scripts/create_geocint_user.sh](scripts/create_geocint_user.sh) to initialize the user schema.
 
 `sudo scripts/create_geocint_user.sh [username]`
