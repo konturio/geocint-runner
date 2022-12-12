@@ -64,6 +64,8 @@ def print_html(strOutputFile, tblStatus1):
     n_targets_frozen = 0
     n_targets_failed = 0
     oldest_completed = ''
+    # example url -> https://stratum.kontur.io/geocint
+    url = sys.argv[2]
 
     for record in tblStatus:
         n_targets_total = n_targets_total + 1
@@ -83,15 +85,15 @@ def print_html(strOutputFile, tblStatus1):
         <html>
 
         <head>
-            <link rel="stylesheet" href="/report/style.css">
+            <link rel="stylesheet" href='""" + url + """/report/style.css'>
             <link href='https://fonts.googleapis.com/css?family=IBM Plex Sans Condensed' rel='stylesheet'>
-            <script src="/report/sorttable.js" type="text/javascript"> </script>
-            <script src="/report/script_u.js" type="text/javascript"> </script>
+            <script src='""" + url + """/report/sorttable.js' type="text/javascript"> </script>
+            <script src='""" + url + """/report/script_u.js' type="text/javascript"> </script>
         </head>
 
         <body>
             <div id="stuff">
-                <img class="img" src="/report/Kontur_logo_main.png" />
+                <img class="img" src='""" + url + """/report/Kontur_logo_main.png' />
                 <div class="vertical-center">
                     <p>PIPELINE DASHBOARD</p>
                 </div>
@@ -126,7 +128,7 @@ def print_html(strOutputFile, tblStatus1):
     fo.write('<th>Log</th>')
     fo.write('</tr>')
     for record in tblStatus:
-        log_url = "https://geocint.kontur.io/geocint/logs/" + \
+        log_url = url + "/logs/" + \
             record[6]+"/" + record[0] + "/log.txt"
         fo.write('<tr class="'+record[2]+'">')
         fo.write('<td>'+record[0]+'</td>')  # target_name
