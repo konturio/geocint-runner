@@ -1,6 +1,11 @@
 #!/bin/sh
-PSQL_SELECT='psql -t -A -U gis -c'
-PSQL_COMMAND='psql -q -U gis -c'
+
+# Set variables
+. ~/config.inc.sh
+export PGDATABASE
+
+PSQL_SELECT='psql -t -A -U $PGDATABASE -c'
+PSQL_COMMAND='psql -q -U $PGDATABASE -c'
 
 username=$1
 

@@ -51,7 +51,7 @@ if [ "$UPDATE_OSM_LOGIC" = "true" ]; then
   cd ~/geocint-openstreetmap; git pull --rebase --autostash || { git stash && git pull && echo 'git rebase autostash geocint-openstreetmap failed, stash and pull executed' | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI; }
 fi
 
-# Update privat repo if updating is true in config
+# Update private repo if updating is true in config
 if [ "$UPDATE_PRIVATE" = "true" ]; then
   cd ~/$PRIVATE_REPO_NAME; git pull --rebase --autostash || { git stash && git pull && echo 'git rebase autostash $PRIVATE_REPO_NAME failed, stash and pull executed' | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI; }
 fi
@@ -66,7 +66,7 @@ mkdir -p ~/files_shouldnt_be_copy
 mv ~/geocint-openstreetmap/README.md ~/files_shouldnt_be_copy/osm_readme.md
 mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
 
-# use nohup to make cp return error when target file already exuists
+# use nohup to make cp return error when target file already exists
 rm -f ~/nohup.out
 nohup cp -ia ~/geocint-runner/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
 nohup cp -ia ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
