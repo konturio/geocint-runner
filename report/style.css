@@ -18,6 +18,18 @@ body {
     margin-left: 10%;
 }
 
+#statusChart {
+    margin-left: 10%;
+    background-color: white;
+    color: black;
+    border: 2px solid #03c6fc;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
 #myTable {
     border-collapse: collapse;
     width: 80%;

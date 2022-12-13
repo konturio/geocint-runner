@@ -15,8 +15,8 @@ DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 BUFFER_OF_DAYS = 15
 
-dat_file_name = "../status.dat"
-dashboard_file_name = "../report.html"
+dat_file_name = "status.dat"
+dashboard_file_name = "report.html"
 
 
 # ====================================================================================
@@ -115,6 +115,7 @@ def print_html(strOutputFile, tblStatus1):
     fo.write('<td align="center">' + oldest_completed.replace('T', ' ') + '</td></tr>')
     fo.write('</table>')
     fo.write('<h2>Target status</h2>')
+    fo.write('<a id="statusChart" target="_blank" href ="make.svg">'+'Status Chart'+'</a></br>')
     fo.write('<input type="text" id="myInput" onkeyup="filterTarget()" placeholder="Search for target name.." title="Type in a name">')
     fo.write('<table id="myTable" class="sortable">')
     fo.write('<tr class="header">')
@@ -234,7 +235,7 @@ elif command == "pipeline" and target_status == "completed":
 
 elif command == "DB":
     date_buffer = datetime.today() - timedelta(BUFFER_OF_DAYS)
-    DB = loadDatFile("../make_profile.db", separator=" ")
+    DB = loadDatFile("make_profile.db", separator=" ")
 
     for record in DB:
 

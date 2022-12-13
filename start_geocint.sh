@@ -123,3 +123,5 @@ make -k -q -n --debug=b $RUN_TARGETS 2>&1 | grep -v Trying | grep -v Rejecting |
 # redraw the make.svg after build
 profile_make
 
+# create status report
+python3 scripts/create_status_report.py "DB"
