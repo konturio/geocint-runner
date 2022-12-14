@@ -16,7 +16,7 @@ DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 BUFFER_OF_DAYS = 15
 
 dat_file_name = "status.dat"
-dashboard_file_name = "report.html"
+dashboard_file_name = "index.html"
 
 
 # ====================================================================================
