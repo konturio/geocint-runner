@@ -75,8 +75,4 @@ deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.g
 		--profile your_s3_profile \
 		--acl public-read
 	touch $@
-
-prod: deploy/s3/fire_stations ## Last target to prove that all targets chains were built
-	# Set this target as a value for the ALL_TARGETS parameter
-	echo "Prod target was built"
 	

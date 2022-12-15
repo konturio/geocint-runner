@@ -103,6 +103,14 @@ echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean
 	rm -rf $RM_DIRECTORIES
 	profile_make_clean $TARGET_TO_CLEAN
 	$CLEAN_OPTIONALLY" >> ~/$GENERAL_FOLDER/Makefile
+
+# add empty line between clean and build targets	
+echo -e "\n"
+
+# compose variables from configuration to build target	
+echo "build: $RUN_TARGETS
+	touch \\$\@
+	echo '$RUN_TARGETS target has built\!' | python3 scripts/slack_message.py geocint $SLACK_CHANNEL '$SLACK_BOT_NAME' $SLACK_BOT_EMOJI " >> ~/$GENERAL_FOLDER/Makefile
 	
 #add clean target to Makefile
 echo "include $OSM_MAKE_NAME $PRIVATE_MAKE_NAME" >> ~/$GENERAL_FOLDER/Makefile
@@ -111,7 +119,7 @@ cd ~/$GENERAL_FOLDER
 
 # Include targets into all tagret dependencies
 sed -i "1s/.*/export PGDATABASE = $PGDATABASE/" ~/$GENERAL_FOLDER/Makefile
-sed -i "4s/.*/all\: $ALL_TARGETS \#\# final target/" ~/$GENERAL_FOLDER/Makefile
+sed -i "4s/.*/all\: build $ALL_TARGETS \#\# final target/" ~/$GENERAL_FOLDER/Makefile
 
 # run clean target before pipeline running
 profile_make clean
@@ -124,8 +132,8 @@ branch_private="$(cd ~/$PRIVATE_REPO_NAME; git rev-parse --abbrev-ref HEAD)"
 # send message with run information
 echo "Geocint server: current geocint-runner branch is $branch_runner, geocint-openstreetmap branch is $branch_osm, $PRIVATE_REPO_NAME branch is $branch_private. Running $RUN_TARGETS targets." | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 # run pipeline
-profile_make -j -k $RUN_TARGETS
-make -k -q -n --debug=b $RUN_TARGETS 2>&1 | grep -v Trying | grep -v Rejecting | grep -v implicit | grep -v "Looking for" | grep -v "Successfully remade" | tail -n+10 | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+profile_make -j -k build
+make -k -q -n --debug=b build 2>&1 | grep -v Trying | grep -v Rejecting | grep -v implicit | grep -v "Looking for" | grep -v "Successfully remade" | tail -n+10 | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 
 # redraw the make.svg after build
 profile_make
