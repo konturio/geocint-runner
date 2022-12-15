@@ -63,20 +63,30 @@ find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 # Copy files from repositories to general folder
 # move readme files to temporary dir to exclude them from copying process
 mkdir -p ~/files_shouldnt_be_copy
+mv ~/geocint-runner/README.md ~/files_shouldnt_be_copy/runner_readme.md
 mv ~/geocint-openstreetmap/README.md ~/files_shouldnt_be_copy/osm_readme.md
 mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
 mv ~/geocint-openstreetmap/LICENSE ~/files_shouldnt_be_copy/osm_LICENSE.md
+mv ~/geocint-runner/LICENSE ~/files_shouldnt_be_copy/runner_LICENSE.md
+
+for((i=1;i<=10;i++))
+do
+    echo $i
+done
 
 # use nohup to make cp return error when target file already exists
 rm -f ~/nohup.out
 nohup cp -ia ~/geocint-runner/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
 nohup cp -ia ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
 nohup cp -ia ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
+echo -e "\n" >>~/nohup.out
 
 # move readme back after copying process
 mv ~/files_shouldnt_be_copy/osm_readme.md ~/geocint-openstreetmap/README.md 
 mv ~/files_shouldnt_be_copy/private_readme.md ~/$PRIVATE_REPO_NAME/README.md
 mv ~/files_shouldnt_be_copy/osm_LICENSE.md ~/geocint-openstreetmap/LICENSE
+mv ~/files_shouldnt_be_copy/runner_readme.md ~/geocint-runner/README.md
+mv ~/files_shouldnt_be_copy/runner_LICENSE.md ~/geocint-runner/LICENSE
 rm -r ~/files_shouldnt_be_copy
 
 # count number of copy conflicts
