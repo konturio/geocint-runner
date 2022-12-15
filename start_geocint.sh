@@ -76,7 +76,6 @@ rm -f ~/nohup.out
 nohup cp -ia ~/geocint-runner/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
 nohup cp -ia ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
 nohup cp -ia ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
-echo -e "\n" >>~/nohup.out
 
 # move readme back after copying process
 mv ~/files_shouldnt_be_copy/osm_readme.md ~/geocint-openstreetmap/README.md 
