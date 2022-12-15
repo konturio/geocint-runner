@@ -69,10 +69,7 @@ mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
 mv ~/geocint-openstreetmap/LICENSE ~/files_shouldnt_be_copy/osm_LICENSE.md
 mv ~/geocint-runner/LICENSE ~/files_shouldnt_be_copy/runner_LICENSE.md
 
-for((i=1;i<=10;i++))
-do
-    echo $i
-done
+sleep 10
 
 # use nohup to make cp return error when target file already exists
 rm -f ~/nohup.out
