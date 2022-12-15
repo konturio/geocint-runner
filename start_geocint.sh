@@ -78,8 +78,7 @@ mv ~/files_shouldnt_be_copy/private_readme.md ~/$PRIVATE_REPO_NAME/README.md
 rm -r ~/files_shouldnt_be_copy
 
 # count number of copy conflicts
-sed -i '/^nohup/d' ~/nohup.out
-nohup_length="$(cat ~/nohup.out | grep -v ^$ | wc -l)"
+nohup_length="$(cat ~/nohup.out | grep 'overwrite' | wc -l)"
 
 # if number of copy conflicts more than 0  - exit and send message with details to slack channel
 if [ $nohup_length -eq 0 ]
