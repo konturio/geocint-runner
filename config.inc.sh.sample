@@ -1,10 +1,11 @@
 # general variables
 # variable to store additional paths, that should be added to PATH variable
+# replase "gis" with your user name
 PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
 # directory for pipeline execution 
 GENERAL_FOLDER=geocint
 # directories that should be added to env
-OPTIONAL_DIRECTORIES='.'
+OPTIONAL_DIRECTORIES=''
 # name of your private repositry
 PRIVATE_REPO_NAME=geocint-private
 # name of makefile from your private repositry
@@ -37,10 +38,6 @@ SLACK_BOT_EMOJI='cat'
 # database
 # name of postgresql database
 PGDATABASE='test'
-
-# additional instalation
-# additional packages that should be installed
-TO_INSTALL='sudo pip3 install geopandas'
 
 # clear target - Cleans the worktree for next nightly run. Does not clean non-repeating targets.
 RM_DIRECTORIES='data/planet-is-broken'
