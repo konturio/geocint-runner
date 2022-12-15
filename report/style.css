@@ -7,7 +7,7 @@ body {
 }
 
 #myInput {
-    background-image: url('https://www.w3schools.com/css/searchicon.png');
+    background-image: url('searchicon.png');
     background-position: 10px 10px;
     background-repeat: no-repeat;
     width: 20%;

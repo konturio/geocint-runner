@@ -15,15 +15,14 @@ DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 BUFFER_OF_DAYS = 15
 
-dat_file_name = "status.dat"
 dashboard_file_name = "index.html"
-
+tblStatus = []
 
 # ====================================================================================
 # home-brew relational DB interface
 # plain files pipe (|) separated
 # ====================================================================================
-def loadDatFile(strInputFile, encoding="utf-8", separator="|"):
+def loadDBFile(strInputFile, encoding="utf-8", separator="|"):
     cells = []
     if os.path.exists(strInputFile):
         filehandle = open(strInputFile, 'r', encoding=encoding)
@@ -39,20 +38,6 @@ def loadDatFile(strInputFile, encoding="utf-8", separator="|"):
         # end of while
         filehandle.close()
     return cells
-
-
-def saveDatFile(cells, strOutputFile):
-
-    filehandle = open(strOutputFile, 'w', encoding="utf-8")
-    for row in cells:
-        txt = ""
-        for field in row:
-            if txt != "":
-                txt = txt + "|"
-            txt = txt + field
-        filehandle.write(txt+'\n')
-    filehandle.close()
-
 
 def print_html(strOutputFile, tblStatus1):
     tblStatus = sorted(
@@ -147,10 +132,8 @@ def print_html(strOutputFile, tblStatus1):
 
 
 def processTargetStatus(target_name, target_status, status_date, dependencies, target_log_folder):
-    # 1. read file
-    tblStatus = loadDatFile(dat_file_name)
 
-    # 2-#3. find record, update status and date
+    # 1-2. find record, update status and date
 
     index = -1
     for i in range(len(tblStatus)):
@@ -181,30 +164,19 @@ def processTargetStatus(target_name, target_status, status_date, dependencies, t
 
     tblStatus[index][STATUS_TARGET_LOG_FOLDER] = target_log_folder
 
-    # 4. save file
-    saveDatFile(tblStatus, dat_file_name)
-
-    # 5. update web-dashboard
+    # 3. update web-dashboard
     print_html(dashboard_file_name, tblStatus)
     return None
 
 
 def processPipelineCompletion():
-    # 1. read file
-    tblStatus = loadDatFile(dat_file_name)
-
-    # 2-#3. find record, update status.
-    # Pipeline completion just means that all started tasks are marked as failed.
 
     for i in range(len(tblStatus)):
         if tblStatus[i][STATUS_TARGET_STATUS] == "started":
             tblStatus[i][STATUS_TARGET_STATUS] = "failed"
             # status date is not changed, because the pipeline termination can occur a way after fail of particular task
 
-    # 4. save file
-    saveDatFile(tblStatus, dat_file_name)
-
-    # 5. update web-dashboard
+    # update web-dashboard
     print_html(dashboard_file_name, tblStatus)
     return None
 
@@ -235,8 +207,7 @@ elif command == "pipeline" and target_status == "completed":
 
 elif command == "DB":
     date_buffer = datetime.today() - timedelta(BUFFER_OF_DAYS)
-    DB = loadDatFile("make_profile.db", separator=" ")
-
+    DB = loadDBFile("make_profile.db", separator=" ")
     for record in DB:
 
         target_name = record[3]
