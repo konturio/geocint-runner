@@ -108,9 +108,12 @@ echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean
 echo -e "\n"
 
 # compose variables from configuration to build target	
-echo "build: $RUN_TARGETS
-	touch \\$\@
-	echo '$RUN_TARGETS target has built\!' | python3 scripts/slack_message.py geocint $SLACK_CHANNEL '$SLACK_BOT_NAME' $SLACK_BOT_EMOJI " >> ~/$GENERAL_FOLDER/Makefile
+echo "build: $RUN_TARGETS ## build target
+	touch \$@
+	echo '$RUN_TARGETS target has built!' | python3 scripts/slack_message.py geocint $SLACK_CHANNEL '$SLACK_BOT_NAME' $SLACK_BOT_EMOJI " >> ~/$GENERAL_FOLDER/Makefile
+	
+# add empty line between clean and build targets	
+echo -e "\n"
 	
 #add clean target to Makefile
 echo "include $OSM_MAKE_NAME $PRIVATE_MAKE_NAME" >> ~/$GENERAL_FOLDER/Makefile
