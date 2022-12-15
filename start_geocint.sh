@@ -69,7 +69,7 @@ mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
 mv ~/geocint-openstreetmap/LICENSE ~/files_shouldnt_be_copy/osm_LICENSE.md
 mv ~/geocint-runner/LICENSE ~/files_shouldnt_be_copy/runner_LICENSE.md
 
-sleep 10
+sleep 5
 
 # use nohup to make cp return error when target file already exists
 rm -f ~/nohup.out
@@ -122,7 +122,7 @@ cd ~/$GENERAL_FOLDER
 
 # Include targets into all tagret dependencies
 sed -i "1s/.*/export PGDATABASE = $PGDATABASE/" ~/$GENERAL_FOLDER/Makefile
-sed -i "4s/.*/all\: build $ALL_TARGETS \#\# final target/" ~/$GENERAL_FOLDER/Makefile
+sed -i "4s~.*~all: build $ALL_TARGETS ## [FINAL] Meta-target on top of all other targets, or targets on parking.~" ~/$GENERAL_FOLDER/Makefile
 
 # run clean target before pipeline running
 profile_make clean
