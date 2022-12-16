@@ -63,7 +63,7 @@ find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 cd ~/$GENERAL_FOLDER
 # Merge 3 repositories to one and check duplicated files
 # This script use IGNORE_EXISTED_FILE variable from confic.inc.sh (by default ignore README.md and LICENSE files in root of every repo)
-python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME | python3 scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 
 # # Copy files from repositories to general folder
 # # move readme files to temporary dir to exclude them from copying process
