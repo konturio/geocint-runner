@@ -121,8 +121,9 @@ echo "include $OSM_MAKE_NAME $PRIVATE_MAKE_NAME" >> ~/$GENERAL_FOLDER/Makefile
 cd ~/$GENERAL_FOLDER
 
 # Include targets into all tagret dependencies
-sed -i "1s/.*/export PGDATABASE = $PGDATABASE/" ~/$GENERAL_FOLDER/Makefile
 sed -i "4s~.*~all: build $ALL_TARGETS ## [FINAL] Meta-target on top of all other targets, or targets on parking.~" ~/$GENERAL_FOLDER/Makefile
+# Add some variables from config file to Makefile
+sed -i "1s/.*/export PGDATABASE = $PGDATABASE\nexport SLACK_CHANNEL = $SLACK_CHANNEL\nexport SLACK_BOT_NAME = \"$SLACK_BOT_NAME\"\nexport SLACK_BOT_EMOJI = $SLACK_BOT_EMOJI\n/" ~/$GENERAL_FOLDER/Makefile
 
 # run clean target before pipeline running
 profile_make clean

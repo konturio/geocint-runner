@@ -1,8 +1,7 @@
 export PGDATABASE = gis
 current_date:=$(shell date '+%Y%m%d')
 
-all: db/table db/function data/in data/mid data/out # all
-	echo "all targets were built"
+all: db/table db/function data/in data/mid data/out ## [FINAL] Meta-target on top of all other targets, or targets on parking.
 
 data: ## file based datasets.
 	mkdir -p $@
@@ -40,4 +39,4 @@ deploy:  ## Directory for deployment targets footprints.
 deploy/s3: | deploy ## Target-created directory for deployments on S3.
 	mkdir -p $@
 	
-## clean target will be attached automatically when autostart_geocint.sh will run
+## clean and build targets will be attached automatically when autostart_geocint.sh will run
