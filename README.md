@@ -73,7 +73,7 @@ Your repository should contain the following required files:
 - your_make (use [private_make.sample](your_make.sample) as an example; keep in mind that make shouldn't be named "Makefile",
 use the other name to keep compatibility with geocint-runner repository)
 
-2. Create a new user with sudo permissions (the default user is "gis"). Keep in mind that the best practice is to use this user name 
+2. Create a new user with sudo permissions or use existing (the default user is "gis"). Keep in mind that the best practice is to use this user name 
 for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 
 3. Clone 3 repository (geocint-runner, geocint-openstreetmap, your repo) to ~/ 
@@ -84,33 +84,24 @@ for creating a Postgres role and database. Path ~/ is equivalent to /home/your_u
 ```
   set the necessary values of variables.
 
-5. Add slack integrations:
-  * install pip - 
-```shell
-sudo apt install -y python3-pip
-```
-  * install slack packages - 
-```shell
-sudo pip3 install slack slackclient
-```
-  * test slack integration - set env variable SLACK_KEY - 
-```shell
-  export SLACK_KEY=your_slack_integration_key
-```
-  * echo "Test slack integration" | python3 scripts/slack_message.py your_slack_channel your_server raccoon
+5. Run installers:
+- ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
+- ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run runner part)
+- ~/geocint-runner/set_mods.sh
 
-6. Set crontab for autostarting pipeline
-  * add SLACK_KEY=your_slack_integration_key to crontab settings, to avoid errors when slack_key doesn't exist
-  * set if you want to run your pipeline at half past 5 am add this row:
-  * /5 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
-  * Keep in mind that time on your local machine and on your server can be different.
+6. Check PostgreSQL version - sudo -u postgres psql -V
+Output example:
+psql (PostgreSQL) 14.5.0
+Your pg_hba.conf location is - /ets/postgresql/9/main/pg_hba.conf. 
+Keep in mind that you shoul use sudo to get access to this file 
+```shell
+     sudo nano /ets/postgresql/9/main/pg_hba.conf
+```
 
-7. Run ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
-
-8. Add connection settings to the pg_hba.conf
+Add connection settings to the /ets/postgresql/9/main/pg_hba.conf
 `local   gis +geocint_users  trust`
 
-9. Create postgresql role and create postgresql extensions:
+7. Create postgresql role and create postgresql extensions:
 ```shell
     sudo -u postgres psql
     create role gis login;
@@ -124,10 +115,16 @@ sudo pip3 install slack slackclient
     create extension h3_postgis;
     -- create any additional extension, that you need
 ```
-10. Run the pipeline manually, or set the necessary time in crontab
+8. Run the pipeline manually, or set the necessary time in crontab
 ```shell
+    export SLACK_KEY=your_slack_integration_key 
     /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 ```
+5. Set crontab for autostarting pipeline
+  * add SLACK_KEY=your_slack_integration_key to crontab settings, to avoid errors when slack_key doesn't exist
+  * set if you want to run your pipeline at half past 5 am add this row:
+  * /5 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
+  * Keep in mind that time on your local machine and on your server can be different.
 
 ### Geocint deployment best practices:
 
