@@ -68,8 +68,7 @@ def main():
     ignore_list = get_config_variable('config.inc.sh','IGNORE_EXISTED_FILE',',')
     general_folder = get_config_variable('config.inc.sh','GENERAL_FOLDER',',')
     
-    
-    
+    # create list with non-ignored files from all repositories  
     files = []    
     files += get_files_list(runner, ignore_list)
     files += get_files_list(openstreetmap, ignore_list)
@@ -79,7 +78,7 @@ def main():
     
     # check if duplicates exist
     if len(duplicated_files) > 0:
-        sys.stdout.write(f'Skip start: duplicate files were found while copying files to a {general_folder[0]} folder: '+ ', '.join(duplicated_files) + '\n')
+        sys.stdout.write(f'Skip start: duplicate files were found while copying files to a {general_folder[0]} folder: '+ ',\n'.join(duplicated_files) + '\n')
         sys.exit(1)
     else:
         # copy folder structure
