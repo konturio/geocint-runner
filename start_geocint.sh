@@ -63,44 +63,16 @@ find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 cd ~/
 # Merge 3 repositories to one and check duplicated files
 # This script use IGNORE_EXISTED_FILE variable from confic.inc.sh (by default ignore README.md and LICENSE files in root of every repo)
-python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+COPY_MESSAGE="$(python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME)"
 
-# # Copy files from repositories to general folder
-# # move readme files to temporary dir to exclude them from copying process
-# mkdir -p ~/files_shouldnt_be_copy
-# mv ~/geocint-runner/README.md ~/files_shouldnt_be_copy/runner_readme.md
-# mv ~/geocint-openstreetmap/README.md ~/files_shouldnt_be_copy/osm_readme.md
-# mv ~/$PRIVATE_REPO_NAME/README.md ~/files_shouldnt_be_copy/private_readme.md
-# mv ~/geocint-openstreetmap/LICENSE ~/files_shouldnt_be_copy/osm_LICENSE.md
-# mv ~/geocint-runner/LICENSE ~/files_shouldnt_be_copy/runner_LICENSE.md
-
-# sleep 5
-
-# # use nohup to make cp return error when target file already exists
-# rm -f ~/nohup.out
-# nohup cp -ia ~/geocint-runner/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
-# nohup cp -ia ~/geocint-openstreetmap/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
-# nohup cp -ia ~/$PRIVATE_REPO_NAME/* ~/$GENERAL_FOLDER 2>>~/nohup.out &
-
-# # move readme back after copying process
-# mv ~/files_shouldnt_be_copy/osm_readme.md ~/geocint-openstreetmap/README.md 
-# mv ~/files_shouldnt_be_copy/private_readme.md ~/$PRIVATE_REPO_NAME/README.md
-# mv ~/files_shouldnt_be_copy/osm_LICENSE.md ~/geocint-openstreetmap/LICENSE
-# mv ~/files_shouldnt_be_copy/runner_readme.md ~/geocint-runner/README.md
-# mv ~/files_shouldnt_be_copy/runner_LICENSE.md ~/geocint-runner/LICENSE
-# rm -r ~/files_shouldnt_be_copy
-
-# # count number of copy conflicts
-# nohup_length="$(cat ~/nohup.out | grep 'overwrite' | wc -l)"
-
-# # if number of copy conflicts more than 0  - exit and send message with details to slack channel
-# if [ $nohup_length -eq 0 ]
-# then
-#   echo "Copy from geocint-runner, geocint-openstreetmap and $PRIVATE_REPO_NAME to geocint folder completed successfully" | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
-# else
-#   echo "Skip start: duplicate files were found while copying files to a geocint folder: $(cat ~/nohup.out)" | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
-#   exit 1
-# fi
+# Chec if the message starts with "Copy.." in another case send message and exit
+if [ $COPY_MESSAGE == C* ]
+then
+   echo $COPY_MESSAGE | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+ else
+   echo $COPY_MESSAGE | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+   exit 1
+fi
 
 # compose variables from configuration to clean target
 echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.

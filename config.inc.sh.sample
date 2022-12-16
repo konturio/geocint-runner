@@ -44,3 +44,7 @@ RM_DIRECTORIES='data/planet-is-broken'
 TARGETS_TO_CLEAN='data/planet-latest-updated.osm.pbf'
 CLEAN_OPTIONALLY='# Clean docker images
 	docker image prune --force --filter label=stage=your-docker-image'
+	
+# ignored files
+# this line contains files, that should be ignored in copy process
+IGNORE_EXISTED_FILE='README.md,LICENSE'
