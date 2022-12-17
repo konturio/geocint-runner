@@ -68,9 +68,9 @@ copy_message="$(python3 geocint-runner/scripts/merge_repos_and_check_duplicates.
 # Chec if the message starts with "Copy.." in another case send message and exit
 if [ "$(echo $copy_message | head -c 1)" = "C" ]
 then
-   echo $COPY_MESSAGE | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+   echo $copy_message | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 else
-   echo $COPY_MESSAGE | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+   echo $copy_message | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
    exit 1
 fi
 
