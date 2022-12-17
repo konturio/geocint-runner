@@ -79,7 +79,6 @@ def main():
     # check if duplicates exist
     if len(duplicated_files) > 0:
         sys.stdout.write(f'Skip start: duplicate files were found while copying files to a {general_folder[0]} folder: '+ ',\n'.join(duplicated_files) + '\n')
-        sys.exit(1)
     else:
         # copy folder structure
         copy_folder_structure(runner, general_folder)

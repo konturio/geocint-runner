@@ -63,13 +63,13 @@ find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 cd ~/
 # Merge 3 repositories to one and check duplicated files
 # This script use IGNORE_EXISTED_FILE variable from confic.inc.sh (by default ignore README.md and LICENSE files in root of every repo)
-COPY_MESSAGE="$(python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME)"
+copy_message="$(python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME)"
 
 # Chec if the message starts with "Copy.." in another case send message and exit
-if [ $COPY_MESSAGE == C* ]
+if [ "$(echo $copy_message | head -c 1)" = "C" ]
 then
    echo $COPY_MESSAGE | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
- else
+else
    echo $COPY_MESSAGE | python3 ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
    exit 1
 fi
