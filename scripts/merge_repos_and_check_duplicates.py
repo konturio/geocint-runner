@@ -38,6 +38,7 @@ def get_config_variable(config_name, variable, delimiter):
     
     for i in config:
         if search(variable, i):
+            # transform row with ignored files into list of variables
             ignored_files = (i.split('='))[1].strip('\n').strip('"').strip("'").split(delimiter)
     
     return ignored_files
@@ -45,6 +46,7 @@ def get_config_variable(config_name, variable, delimiter):
 def find_duplicates(files):
     removed_repo = ['/'.join(x.split('/')[1:]) for x in files]
     
+    # return filename patterns that occur more than once 
     duplicated_patterns = [x for x, count in collections.Counter(removed_repo).items() if count > 1]
     
     duplicates = []
@@ -84,6 +86,7 @@ def main():
         copy_folder_structure(runner, general_folder)
         copy_folder_structure(openstreetmap, general_folder)
         copy_folder_structure(private, general_folder)
+        # copy files
         for x in files:
             shutil.copyfile(x, general_folder[0]+'/'+'/'.join(x.split('/')[1:]))
         sys.stdout.write(f'Copy from {runner}, {openstreetmap} and {private} to {general_folder[0]} folder completed successfully\n')    

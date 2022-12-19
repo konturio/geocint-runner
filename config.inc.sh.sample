@@ -1,4 +1,7 @@
 # general variables
+# your user name, that will be used also as Postgresql role name and Postfresql database name
+USER_NAME='gis'
+
 # variable to store additional paths, that should be added to PATH variable
 # replase "gis" with your user name
 PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
@@ -22,9 +25,10 @@ UPDATE_OSM_LOGIC=false
 UPDATE_PRIVATE=true
 
 # targets block
-# list of dependencies for target "all"
-ALL_TARGETS='db/table/osm'
-# list of targets that will be runned
+# list of dependencies for target "all" - [FINAL] Meta-target on top of all other targets, or targets on parking
+# add here the final target of the chains that you want to execute not regularly, but only in certain cases
+ALL_TARGETS=''
+# list of targets that will be runned automatically
 RUN_TARGETS='your_final_target'
 
 # slack integration
@@ -34,17 +38,25 @@ SLACK_CHANNEL='Your_slack_channel'
 SLACK_BOT_NAME='Your bot name'
 # name of slack emoji that will be used as bot's avatar for sending messages from pipeline
 SLACK_BOT_EMOJI='cat'
-
-# database
-# name of postgresql database
-PGDATABASE='test'
+# slack integration token, replace 'your_slack_key' with your slack integration key
+SLACK_KEY='your_slack_key'
 
 # clear target - Cleans the worktree for next nightly run. Does not clean non-repeating targets.
+# store directories that should be removed before each run, use whitespace ' ' as a delimiter to add directory
 RM_DIRECTORIES='data/planet-is-broken'
+# store targets that should be cleaned before each run, use whitespace ' ' as a delimiter to add target
 TARGETS_TO_CLEAN='data/planet-latest-updated.osm.pbf'
+# set of optional commands that should be executed during the clean target building
+# replace with empty line '' if you don't have any additional command to execution
 CLEAN_OPTIONALLY='# Clean docker images
 	docker image prune --force --filter label=stage=your-docker-image'
 	
 # ignored files
-# this line contains files, that should be ignored in copy process
+# this variable contains filenames, that should be ignored in copy process
+# add here names of files that duplicated between geocint-runner, geocint-openstreetmap and your private repository
+# that files will not be copy from all repositories
+# Use ',' as a delimiter
+# By default this variable contain README.md and LICENSE files that have duplicates
+# Keep in mind that if you want to add file you should remove from filepath repository
+# eg: geocint-runner/scripts/script_do_smth.py >>> scripts/script_do_smth.py
 IGNORE_EXISTED_FILE='README.md,LICENSE'

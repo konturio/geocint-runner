@@ -4,7 +4,7 @@
 . ~/config.inc.sh
 export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME PRIVATE_MAKE_NAME OSM_MAKE_NAME 
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE ALL_TARGETS RUN_TARGETS
-export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI PGDATABASE
+export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI SLACK_KEY USER_NAME
 export TARGET_TO_CLEAN RM_DIRECTORIES CLEAN_OPTIONALLY
 
 cleanup() {
@@ -61,7 +61,7 @@ find ~/$GENERAL_FOLDER/. -type d -not -name  "d*" -not -name '*.*' -not -name  "
 find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -delete
 
 cd ~/
-# Merge 3 repositories to one and check duplicated files
+# Merge geocint-runner, geocint-openstreetmap and your private repo to one folder and check duplicated files
 # This script use IGNORE_EXISTED_FILE variable from confic.inc.sh (by default ignore README.md and LICENSE files in root of every repo)
 copy_message="$(python3 geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME)"
 
@@ -100,7 +100,7 @@ cd ~/$GENERAL_FOLDER
 # Include targets into all tagret dependencies
 sed -i "4s~.*~all: build $ALL_TARGETS ## [FINAL] Meta-target on top of all other targets, or targets on parking.~" ~/$GENERAL_FOLDER/Makefile
 # Add some variables from config file to Makefile
-sed -i "1s/.*/export PGDATABASE = $PGDATABASE\nexport SLACK_CHANNEL = $SLACK_CHANNEL\nexport SLACK_BOT_NAME = \"$SLACK_BOT_NAME\"\nexport SLACK_BOT_EMOJI = $SLACK_BOT_EMOJI\n/" ~/$GENERAL_FOLDER/Makefile
+sed -i "1s/.*/export USER_NAME = $USER_NAME\nexport SLACK_CHANNEL = $SLACK_CHANNEL\nexport SLACK_BOT_NAME = \"$SLACK_BOT_NAME\"\nexport SLACK_BOT_EMOJI = $SLACK_BOT_EMOJI\n/" ~/$GENERAL_FOLDER/Makefile
 
 # run clean target before pipeline running
 profile_make clean

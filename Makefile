@@ -1,4 +1,4 @@
-export PGDATABASE = gis
+export USER_NAME = gis
 current_date:=$(shell date '+%Y%m%d')
 
 all: db/table db/function data/in data/mid data/out ## [FINAL] Meta-target on top of all other targets, or targets on parking.
