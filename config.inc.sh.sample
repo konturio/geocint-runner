@@ -38,16 +38,6 @@ SLACK_BOT_EMOJI=cat
 # slack integration token, replace 'your_slack_key' with your slack integration key
 SLACK_KEY=your_slack_key
 
-# clear target - Cleans the worktree for next nightly run. Does not clean non-repeating targets.
-# store directories that should be removed before each run, use whitespace ' ' as a delimiter to add directory
-RM_DIRECTORIES='data/planet-is-broken'
-# store targets that should be cleaned before each run, use whitespace ' ' as a delimiter to add target
-TARGETS_TO_CLEAN='data/planet-latest-updated.osm.pbf'
-# set of optional commands that should be executed during the clean target building
-# replace with empty line '' if you don't have any additional command to execution
-CLEAN_OPTIONALLY='# Clean docker images
-	docker image prune --force --filter label=stage=your-docker-image'
-	
 # ignored files
 # this variable contains filenames, that should be ignored in copy process
 # add here names of files that duplicated between geocint-runner, geocint-openstreetmap and your private repository

@@ -68,10 +68,10 @@ Your Makefile should start with export export block:
 file := ~/config.inc.sh
 # Add here export for every varible from configuration file that you are goint to use in targets
 export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
-export SLACK_CHANNEL := $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
-export SLACK_BOT_NAME := $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
-export SLACK_BOT_EMOJI := $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${file} | cut -d "=" -f 2)
-export SLACK_BOT_KEY := $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "=" -f 2)
+export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
+export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
+export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${file} | cut -d "=" -f 2)
+export SLACK_BOT_KEY = $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "=" -f 2)
 
 # these makefiles stored in geocint-runner and geocint-openstreetmap repositories
 # runner_make contains basic set of targets for creation project folder structure
@@ -79,6 +79,11 @@ export SLACK_BOT_KEY := $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "
 include runner_make osm_make
 
 all: dev ## [FINAL] Meta-target on top of all other targets, or targets on parking.
+
+clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
+	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
+	rm -rf data/planet-is-broken
+	profile_make_clean data/planet-latest-updated.osm.pbf
 ```
 
 1. Create a new user with sudo permissions or use existing (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
@@ -136,8 +141,7 @@ bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
 After start_geocint.sh is run, it exports the variables from the configuration file ~/config.inc.sh. 
 It will then check the update flags in ~/config.inc.sh and git pull the repositories that have the flag set to “true”. 
-Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name of this folder in ~/config.inc.sh file with $GENERAL_FOLDER variable. 
-Next, start_geocint.sh generates clean targets and adds include instructions. 
+Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name of this folder in ~/config.inc.sh file with $GENERAL_FOLDER variable.
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets

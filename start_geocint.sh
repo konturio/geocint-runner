@@ -5,7 +5,6 @@
 export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME PRIVATE_MAKE_NAME OSM_MAKE_NAME 
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE RUN_TARGETS
 export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI SLACK_KEY USER_NAME
-export TARGET_TO_CLEAN RM_DIRECTORIES CLEAN_OPTIONALLY
 
 cleanup() {
   rm -f ~/$GENERAL_FOLDER/make.lock
@@ -73,16 +72,6 @@ else
    echo $copy_message | python ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
    exit 1
 fi
-
-# compose variables from configuration to clean target
-echo "clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
-	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
-	rm -rf $RM_DIRECTORIES
-	profile_make_clean $TARGET_TO_CLEAN
-	$CLEAN_OPTIONALLY" >> ~/$GENERAL_FOLDER/runner_make
-
-# add empty line between clean and build targets	
-echo -e "\n"
 
 # run clean target before pipeline running
 cd ~/$GENERAL_FOLDER
