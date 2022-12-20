@@ -7,7 +7,7 @@
 * How geocint pipeline work
     * How start_geocint.sh works
     * How to write targets
-    * User schemas
+    * User schemas in database
     * How to analyse build time for tables
 * Best practices of using
 
@@ -22,11 +22,18 @@ to database OpenStreetMap planet dump
 During the deployment process, you should clone all these repos to ~/.
 Then start_geocint.sh will copy files from all these repositories to ~/geocint folder. Geocint folder will be the working folder for geocint pipeline
 
-In general case ~/geocint folder includes the next folders:
+In general case ~/geocint folder includes the next files and folders:
+- [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
+  posting info messages
+- [runner_install.sh](runner_install.sh) - script, that runs installation of required packages of geocint-runner part
+- [config.inc.sh.sample](config.inc.sh.sample) - sample config file
+- [runner_make](runner_make) - map dependencies between data generation stages
+- [your_make.sample](your_make.sample) - sample make file that shows how to integrate geocint-runner, 
+geocint-openstreetmap and your own chains of targets
 - [functions/](functions) - service SQL functions, used in more than one other file
 - [procedures/](procedures) - service SQL procedures, used in more than one other file
-- [scripts/](scripts) - scripts that perform data transformation on top of table without creating new table
-- [tables/](tables) - SQL, which generates a table with the same name as the script
+- [scripts/](scripts) - scripts that perform data transformation
+- [tables/](tables) - SQL, which generates a table
 - [static_data](static_data) - static file-based data stored in geocint repository
 All these folders are removed and recreated each time when geocint pipeline starts.
 
@@ -49,11 +56,30 @@ You shouldn’t store all your input datasets in data/in/ folder. To make your d
 ## Geocint open-source installation and first run guide
 
 ### Intallation
-Before to install your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
+Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
 Your repository should contain the following required files:
 - README.md (could be empty, just make sure that it exists)
 - install.sh (use [runner_install.sh](runner_install.sh) as an example, store installation of your additional dependencies)
-- your_make (use [private_make.sample](your_make.sample) as an example; file to store your own additional targets chains. Keep in mind that make shouldn't be named "Makefile", use the other name to keep compatibility with geocint-runner repository)
+- your_make (use [private_make.sample](your_make.sample) as an example; file to store your own additional targets chains. Keep in mind that make should be named "Makefile".
+
+Your Makefile should start with export export block:
+```
+# configuration file
+file := ~/config.inc.sh
+# Add here export for every varible from configuration file that you are goint to use in targets
+export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
+export SLACK_CHANNEL := $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
+export SLACK_BOT_NAME := $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
+export SLACK_BOT_EMOJI := $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${file} | cut -d "=" -f 2)
+export SLACK_BOT_KEY := $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "=" -f 2)
+
+# these makefiles stored in geocint-runner and geocint-openstreetmap repositories
+# runner_make contains basic set of targets for creation project folder structure
+# osm_make contains contain set of targets for osm data processing
+include runner_make osm_make
+
+all: dev ## [FINAL] Meta-target on top of all other targets, or targets on parking.
+```
 
 1. Create a new user with sudo permissions or use existing (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 2. Clone 3 repository (geocint-runner, geocint-openstreetmap, your repo) to ~/
@@ -66,10 +92,11 @@ export SLACK_KEY=<your_key>
 cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
 ```
 Open ~/config.inc.sh and set the necessary values of variables.
+
 5. Run installers:
 - ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
 - ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run runner part)
-- ~/geocint-runner/set_mods.sh
+- ~/geocint-runner/set_mods.sh (create /public_html and /domlogs folders and set access modes)
 6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different) :
 ```shell
 	# open psql console with admin (user postgres)
@@ -110,7 +137,7 @@ bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 After start_geocint.sh is run, it exports the variables from the configuration file ~/config.inc.sh. 
 It will then check the update flags in ~/config.inc.sh and git pull the repositories that have the flag set to “true”. 
 Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name of this folder in ~/config.inc.sh file with $GENERAL_FOLDER variable. 
-Next, start_geocint.sh generates build and clean targets and adds include instructions. 
+Next, start_geocint.sh generates clean targets and adds include instructions. 
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets
@@ -129,7 +156,7 @@ deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.g
 ```
 As a result of this target execution, we don't have a file, which means we have to use the touch $@ line at the end. This command will create an empty deploy/s3/fire_stations file whose creation timestamp will be used by Make-profiler.
 
-if you want to rebuild some targets chain each time please see How geocint pipeline workyou run the pipeline, you must add the initial target of this chain to the TARGETS_TO_CLEAN variable in the configuration file config.inc.sh).
+If you want to rebuild some targets chain each time when you run the pipeline, you must add the initial target of this chain to the TARGETS_TO_CLEAN variable in the configuration file config.inc.sh) for additional information please see How geocint pipeline work.
 For example, you have a target’s chain like a (here is a simple chain of targets, just target’s name):
 ```
 data/in/some.tiff: | data/in ## initial target, download input data
@@ -146,7 +173,7 @@ data/out/output.geojson.gz: data/in/some.tiff db/table/table_from_csv db/table/t
 ```
 You can read more about target's dependencies(prerequisites) in the official [GNU Make manual](https://www.gnu.org/software/make/manual/make.html#Prerequisite-Types)
 
-### User schemas
+### User schemas in database
 
 User schemas can be used for separate pipeline and dev data.
 Run [scripts/create_geocint_user.sh](scripts/create_geocint_user.sh) to initialize the user schema.
@@ -165,8 +192,7 @@ Logs for every build are stored in `/home/gis/geocint/logs`
 This command can show lastN {*Total times in ms*} for some {*tablename*} ordered by date
 
 ```bash
-cd /home/gis/geocint/logs
-find . -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -printf "%T+ %p; " -exec awk '/Time:/ {sum += $4} END {print sum/60000 " min"}' '{}' \; | sort
+find /home/gis/geocint/logs -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -printf "%T+ %p; " -exec awk '/Time:/ {sum += $4} END {print sum/60000 " min"}' '{}' \; | sort
 ```
 
 `-mtime -50` - collects every row from 50 days ago to now
@@ -178,7 +204,7 @@ find . -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -pri
 
 There are a few simple rules, follow them to avoid troubles during the creation of your own pipeline:
 * Don’t create targets with a name which already exists in Makefile from geocint-runner repository, osm-make Makefile from geocint-openstreetmap repository or in your own Makefile;
-* Always add a short comment to your target (explain what hi does) - it’s a requirement;
+* Always add a short comment to your target (explain what it does) - it’s a requirement;
 * Don’t use double quotes in comments;
 * Try to avoid views and materialized views;
 * Complex python scripts should become less complex bash+sql scripts;

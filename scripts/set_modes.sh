@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# this script is using one during installation to create /public_html and /domlogs folders and set access modes
+
 # Set variables
 . ~/config.inc.sh
 export USER_NAME

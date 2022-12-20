@@ -36,7 +36,7 @@ https://tldp.org/LDP/abs/html/
 - h3_pg for hexagon grid manipulation, https://github.com/bytesandbrains/h3-pg. When googling for manuals make sure you
   use this specific extension.
 - aws-cli is used to deploy data into s3 buckets or get inputs from there. https://docs.aws.amazon.com/cli/index.html
-- python3 is used for small tasks like unpivoting source data.
+- python is used for small tasks like unpivoting source data.
 - GDAL, OGR, osm-c-tools, osmium, and others are used if they are needed in Bash CLI.
 
 [Install, first run guides and best practices](DOCUMENTATION.md) 
