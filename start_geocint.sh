@@ -85,8 +85,8 @@ branch_private="$(cd ~/$PRIVATE_REPO_NAME; git rev-parse --abbrev-ref HEAD)"
 # send message with run information
 echo "Geocint server: current geocint-runner branch is $branch_runner, geocint-openstreetmap branch is $branch_osm, $PRIVATE_REPO_NAME branch is $branch_private. Running $RUN_TARGETS targets." | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 # run pipeline
-profile_make -j -k build
-make -k -q -n --debug=b build 2>&1 | grep -v Trying | grep -v Rejecting | grep -v implicit | grep -v "Looking for" | grep -v "Successfully remade" | tail -n+10 | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+profile_make -j -k $RUN_TARGETS
+make -k -q -n --debug=b $RUN_TARGETS 2>&1 | grep -v Trying | grep -v Rejecting | grep -v implicit | grep -v "Looking for" | grep -v "Successfully remade" | tail -n+10 | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 
 # redraw the make.svg after build
 profile_make
