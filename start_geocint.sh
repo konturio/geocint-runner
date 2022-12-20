@@ -1,11 +1,13 @@
 #!/bin/bash
 
-# Set variables
+# script, that runs the pipeline: checking required packages, clean and run targets and posting info messages
+# Set variables from the configuration file
 . ~/config.inc.sh
-export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME PRIVATE_MAKE_NAME OSM_MAKE_NAME 
+export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE RUN_TARGETS
 export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI SLACK_KEY USER_NAME
 
+# initialize the pipeline interrupt function for the case when the pipeline can't touch make.lock
 cleanup() {
   rm -f ~/$GENERAL_FOLDER/make.lock
 }
@@ -15,6 +17,7 @@ sh ~/geocint-runner/runner-install.sh || echo 'runner-install.sh returned an err
 sh ~/geocint-openstreetmap/openstreetmap-install.sh || echo 'openstreetmap-install.sh returned an error, check logs for more infornation' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 sh ~/$PRIVATE_REPO_NAME/install.sh || echo 'install.sh returned an error, check logs for more infornation' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 
+# create working directory if not exists
 mkdir -p ~/$GENERAL_FOLDER
 
 # Terminate script after failed command execution
@@ -28,6 +31,7 @@ set +a
 
 cd ~/$GENERAL_FOLDER
 
+# send message to slack channel
 echo "Geocint pipeline is starting nightly build!" | python ~/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 
 # make.lock is a file which exists while pipeline running
@@ -37,6 +41,7 @@ if [ -e make.lock ]; then
   exit 1
 fi
 
+# exit if make.lock file cannot be touched
 touch make.lock
 trap 'cleanup' EXIT
 

@@ -11,10 +11,6 @@ GENERAL_FOLDER=geocint
 OPTIONAL_DIRECTORIES=''
 # name of your private repositry
 PRIVATE_REPO_NAME=geocint-private
-# name of makefile from your private repositry
-PRIVATE_MAKE_NAME=private_make
-# name of makefile from geocint-openstreetmap repositry
-OSM_MAKE_NAME=osm_make
 
 # updates block
 # set to true to pull geocint-runner repo before each run
@@ -32,6 +28,7 @@ RUN_TARGETS='your_final_target'
 # name of slack channel for sending messages from pipeline
 SLACK_CHANNEL=slack_channel
 # name of slack bot for sending messages from pipeline
+# Use "" when your bot name consists whitespaces
 SLACK_BOT_NAME="Your bot name"
 # name of slack emoji that will be used as bot's avatar for sending messages from pipeline
 SLACK_BOT_EMOJI=cat

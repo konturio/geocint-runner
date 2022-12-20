@@ -1,6 +1,8 @@
+## -------------- EXPORT BLOCK ------------------------
+
 # configuration file
 file := ~/config.inc.sh
-# Add here export for every varible from configuration file that you are goint to use in targets
+# Add an export here for each variable from the configuration file that you are going to use in the targets.
 export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
@@ -12,14 +14,19 @@ export SLACK_BOT_KEY = $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "=
 # osm_make contains contain set of targets for osm data processing
 include runner_make osm_make
 
+## ------------- CONTROL BLOCK -------------------------
+
+# replace your_final_target placeholder with the names of final target, that you will use to run pipeline
+# you can also add here the names of targets that should not be rebuilt automatically, but only when conditions are met or at your request
 all: dev ## [FINAL] Meta-target on top of all other targets, or targets on parking.
 
+# by default the clean target is set to serve an update of the OpenStreetMap planet dump during every run
 clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
 	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
 	rm -rf data/planet-is-broken
 	profile_make_clean data/planet-latest-updated.osm.pbf
 
-## --------------- SAMPLE TARGET CHAIN -------------------
+## --------------- SAMPLE TARGET CHAIN ------------------
 
 ## This is an example makefile created to demonstrate how to create and use targets as part of the ETL process.
 
@@ -42,6 +49,7 @@ db/table/fire_stations: db/index/osm_tags_idx ## Extract centroids of fire stati
 					order by osm_id \
 					);"
 	# update db/table/fire_stations time mark to be able to create the correct graph using make-profiler
+	# keep in mind that $@ is the equivalent of the name of the target containing it.
 	touch $@
 
 db/table/fire_stations_h3_r8: db/table/fire_stations ## Create h3 8 resolution hexagons from centroids of fire stations 
@@ -96,4 +104,10 @@ deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.g
 		--profile your_s3_profile \
 		--acl public-read
 	touch $@
-	
+
+# A dev target is an example of a metatagret that depends on all chains of targtes and allows you to run the entire pipeline with only one goal running.
+# Also, this target allows you to send messages to the weak channel in case the entire pipeline was successfully completed (or you can perform any other action)
+dev: deploy/s3/fire_stations ## Send a message about the successful execution of the pipeline
+	#send dev target successfully build- message to slack channel 
+	echo "dev target successfully build" | python scripts/slack_message.py $$SLACK_CHANNEL ${SLACK_BOT_NAME} $$SLACK_BOT_EMOJI
+	touch $@

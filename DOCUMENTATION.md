@@ -9,6 +9,7 @@
     * How to write targets
     * User schemas in database
     * How to analyse build time for tables
+* Make-profiler
 * Best practices of using
 
 ## Geocint folder structure
@@ -19,15 +20,21 @@ Geocint consists of 3 different parts:
 to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
-During the deployment process, you should clone all these repos to ~/.
-Then start_geocint.sh will copy files from all these repositories to ~/geocint folder. Geocint folder will be the working folder for geocint pipeline
+During the installation process, you should clone all these repos to ~/.
+During the installation of geocint pipeline in your home directory (~/) will be created next folders:
+- [public_html] - any public html that you want to share
+- [domlogs] - access and errors logs for files from public_html folder
 
-In general case ~/geocint folder includes the next files and folders:
+Then start_geocint.sh will copy files from all these repositories to ~/geocint folder. Geocint folder will be the working folder for geocint pipeline
+(you can set any another name for this folder with the GENERAL_FOLDER variable in confic.inc.sh file)
+
+In general case ~/geocint folder includes the next files and folders :
 - [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
   posting info messages
 - [runner_install.sh](runner_install.sh) - script, that runs installation of required packages of geocint-runner part
 - [config.inc.sh.sample](config.inc.sh.sample) - sample config file
 - [runner_make](runner_make) - map dependencies between data generation stages
+- [osm_make](runner_make) - makefile with set of targets
 - [your_make.sample](your_make.sample) - sample make file that shows how to integrate geocint-runner, 
 geocint-openstreetmap and your own chains of targets
 - [functions/](functions) - service SQL functions, used in more than one other file
@@ -35,10 +42,9 @@ geocint-openstreetmap and your own chains of targets
 - [scripts/](scripts) - scripts that perform data transformation
 - [tables/](tables) - SQL, which generates a table
 - [static_data](static_data) - static file-based data stored in geocint repository
-All these folders are removed and recreated each time when geocint pipeline starts.
+All these folders and files are removed and recreated each time when geocint pipeline starts.
 
-After running the pipeline, make will create additional folders. These folders are used to store input (in folder), intermediate (mid folder), and output (out folder) data files.
-Make-profiler uses the timestamps of these files as timestamps for the execution of such a target:
+After running the pipeline, make will create additional folders and files. These folders are used to store input (in folder), intermediate (mid folder), and output (out folder) data files:
 - [data/](data) - file-based input, middle, output data.
 	- data/in - all input data, downloaded elsewhere
 	- data/in/raster - all downloaded GeoTIFFs
@@ -53,20 +59,27 @@ Make-profiler uses the timestamps of these files as timestamps for the execution
 These folders are not deleted or re-created each time the geocint pipeline is run, to avoid rebuilding targets that should not be rebuilt every time (if you want to rebuild some targets chain each time please see How geocint pipeline).
 You shouldn’t store all your input datasets in data/in/ folder. To make your data storage more organized, you can create additional folders for separate data sources (for example data/in/source_name). This also applies to other catalogs.
 
+Also after running the pipeline, in make will create additional files:
+- make.lock - a special file used by start_geocint.sh as a flag to check if a pipeline is running so as not to start a new one until the running pipeline is complete
+- make.svg - is a file, stored graphical representation of graph of dependencies of targets
+- make_profile.db - a database used to store information about the execution of targets
+
 ## Geocint open-source installation and first run guide
 
-### Intallation
+### Installation
 Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
 Your repository should contain the following required files:
 - README.md (could be empty, just make sure that it exists)
 - install.sh (use [runner_install.sh](runner_install.sh) as an example, store installation of your additional dependencies)
 - your_make (use [private_make.sample](your_make.sample) as an example; file to store your own additional targets chains. Keep in mind that make should be named "Makefile".
 
-Your Makefile should start with export export block:
+Your Makefile should start with export block:
 ```
+## -------------- EXPORT BLOCK ------------------------
+
 # configuration file
 file := ~/config.inc.sh
-# Add here export for every varible from configuration file that you are goint to use in targets
+# Add an export here for each variable from the configuration file that you are going to use in the targets.
 export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
@@ -75,15 +88,21 @@ export SLACK_BOT_KEY = $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "=
 
 # these makefiles stored in geocint-runner and geocint-openstreetmap repositories
 # runner_make contains basic set of targets for creation project folder structure
-# osm_make contains contain set of targets for osm data processing
+# osm_make contains set of targets for osm data processing
 include runner_make osm_make
 
-all: dev ## [FINAL] Meta-target on top of all other targets, or targets on parking.
+## ------------- CONTROL BLOCK -------------------------
 
+# replace your_final_target placeholder with the names of final target, that you will use to run pipeline
+# you can also add here the names of targets that should not be rebuilt automatically, but only when conditions are met or at your request
+all: your_final_target ## [FINAL] Meta-target on top of all other targets, or targets on parking.
+
+# by default the clean target is set to serve an update of the OpenStreetMap planet dump during every run
 clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
 	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
 	rm -rf data/planet-is-broken
 	profile_make_clean data/planet-latest-updated.osm.pbf
+
 ```
 
 1. Create a new user with sudo permissions or use existing (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
@@ -102,6 +121,7 @@ Open ~/config.inc.sh and set the necessary values of variables.
 - ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
 - ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run runner part)
 - ~/geocint-runner/set_mods.sh (create /public_html and /domlogs folders and set access modes)
+
 6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different) :
 ```shell
 	# open psql console with admin (user postgres)
@@ -128,7 +148,7 @@ add the following line to regenerate make.svg every 5 minutes; make.svg is a fil
 
 ### First run
 
-To automatically start the pipeline, set the preferred time in the crontab installation.
+To automatically start the full pipeline, set the preferred time in the crontab installation.
 For example, to run pipeline at 12:34 set
 34 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
@@ -148,7 +168,7 @@ After these events are completed, start_geocint.sh will launch the targets speci
 
 You can read more about writing targets in the official [GNU Make manual](https://www.gnu.org/software/make/manual/make.html#toc-Writing-Rules)
 
-The name of your target will be the name of the file which Make-profiler will use to define the timestamps when the target was executed. If the result of target execution is a file - target should be named as this file. If as the result of target execution you don't create a new file please add `touch $@` line at the end of your target to create an empty file with the same name as a target.
+The name of your target will be the name of the file which Make-profiler will use to define the timestamps when the target was executed. If the result of target execution is a file - target should be named as this file. If as the result of target execution you don't create a new file please add `touch $@` line at the end of your target to create an empty file with the same name as a target (`$@` is the equivalent of the name of the target containing it).
 For example, target from your_make.sample:
 ```
 deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz | deploy/s3 ## deploy/s3 is a dependency from geocint-runner Makefile
@@ -158,9 +178,10 @@ deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.g
    	 --acl public-read
     touch $@
 ```
-As a result of this target execution, we don't have a file, which means we have to use the touch $@ line at the end. This command will create an empty deploy/s3/fire_stations file whose creation timestamp will be used by Make-profiler.
+As a result of this target execution, we don't have a file, which means we have to execute the `touch $@` command at the end. 
+This command will create an empty deploy/s3/fire_stations file whose creation timestamp will be used by Make-profiler.
 
-If you want to rebuild some targets chain each time when you run the pipeline, you must add the initial target of this chain to the TARGETS_TO_CLEAN variable in the configuration file config.inc.sh) for additional information please see How geocint pipeline work.
+If you want to rebuild some targets chain each time when you run the pipeline, you must add the initial target of this chain to the clean target.
 For example, you have a target’s chain like a (here is a simple chain of targets, just target’s name):
 ```
 data/in/some.tiff: | data/in ## initial target, download input data
@@ -168,8 +189,18 @@ data/mid/data_tiff.csv: data/in/some.tiff | data/mid## extract data from raster 
 db/table/table_from_csv: data/mid/data_tiff.csv | db/table ## load data from CSV to database
 data/out/output.geojson.gz: db/table/table_from_csv | data/out ## extract data from database to output file
 ```
-If you want to rebuild this chain of targets each time when you run the pipeline, you should add data/in/some.tiff target to the TARGETS_TO_CLEAN variable. It means that before each run make will remove data/in/some.tiff if exists and rebuild them and all targets, that have it in list of dependencies (will check dependencies recursively).
-If you do not want to rebuild this chain, just make sure that the final target from your chain doesn’t depend on targets from the TARGETS_TO_CLEAN variable. This method can be useful when you have a large dataset that has not been updated recently and requires heavy and time-consuming pre-processing. In such a case, you probably want to prepare the data and load it into the database once and not repeat this work without changing the input data.
+If you want to rebuild this chain of targets each time when you run the pipeline, you should add data/in/some.tiff target as an argument for profile_make_clean instruction in the clean target (see cod below). 
+```
+# by default the clean target is set to serve an update of the OpenStreetMap planet dump during every run
+clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
+	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
+	rm -rf data/planet-is-broken
+	profile_make_clean data/planet-latest-updated.osm.pbf data/in/some.tiff
+```
+It means that before each run make will remove data/in/some.tiff if exists and rebuild them and all targets, that have it in list of dependencies 
+(will check dependencies recursively).
+
+If you do not want to rebuild this chain, just make sure that your chain doesn’t depend on targets from the clean target. This method can be useful when you have a large dataset that has not been updated recently and requires heavy and time-consuming pre-processing. In such a case, you probably want to prepare the data and load it into the database once and not repeat this work without changing the input data.
 But! Keep in mind, that dependencies inherited recursively, even if you don’t put data/in/some.tiff in the data/out/output.geojson.gz dependencies list, them will be data/out/output.geojson.gz’s dependency. This means that these two lines are equivalent:
 ```
 data/out/output.geojson.gz: db/table/table_from_csv
@@ -204,12 +235,47 @@ find /home/gis/geocint/logs -type f -regex ".*/db/table/osm_admin_boundaries/log
 `-regex ".*/db/table/osm_admin_boundaries/log.txt"` - change `osm_admin_boundaries` to your {*tablename*}
 
 
+## Make-profiler
+
+Make-profiler is used as linter and preprocessor for Make that outputs a network diagram of what is getting built when and why. 
+The output chart (by default make.svg) allows to see what went wrong and quickly get to logs. https://github.com/konturio/make-profiler
+
+After pipeline run make_profiler will create a make.svg file and make_profile.db.
+Make-profile features:
+- SVG build overview;
+- Critical Path is highlighted;
+- Inline pictures-targets into build overview;
+- Logs for each target marked with timestamps;
+- Distinguish a failed target execution from forgotten touch;
+- Navigate to last run's logs from each target directly from call graph;
+- Support for self-documented Makefiles according to http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+
+Example usage
+```shell
+sudo apt install python3-pip graphviz gawk
+sudo pip3 install https://github.com/konturio/make-profiler/archive/master.zip
+
+cd your_project
+profile_make -h                 # have a look at help
+
+profile_make                    # generate overview graph without profiling data
+xdg-open make.svg               # have a look at call graph
+
+profile_make_clean target       # mark target with children as not yet executed
+
+profile_make_lint               # validate Makefile to find orphan targets
+profile_make -j -k target_name  # run some target, record execution times and logs
+xdg-open make.svg               # have a look at call graph with timing data
+
+profile_make -a 2022-05-01      # generate overview graph with full target time only after the specified date
+```
+
 ## Best practices of using
 
 There are a few simple rules, follow them to avoid troubles during the creation of your own pipeline:
 * Don’t create targets with a name which already exists in Makefile from geocint-runner repository, osm-make Makefile from geocint-openstreetmap repository or in your own Makefile;
 * Always add a short comment to your target (explain what it does) - it’s a requirement;
-* Don’t use double quotes in comments;
+* Don’t use double quotes in comments (make-profile will be broken);
 * Try to avoid views and materialized views;
 * Complex python scripts should become less complex bash+sql scripts;
 * Make sure you have source data always available. Do not store it locally on geocint - add a target to download data from S3 at least (you can still store data in a special folder - /static_data, but try to avoid storing important data without a remote backup;
