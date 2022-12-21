@@ -1,46 +1,46 @@
 # general variables
-# your user name, that will be used also as Postgresql role name and Postfresql database name
+# your user name, which will be used also as a Postgresql role name and a Postfresql database name
 USER_NAME='gis'
 
-# variable to store additional paths, that should be added to PATH variable
+# variable to store additional paths, that should be added to the PATH variable
 # replase "gis" with your user name
 PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
 # directory for pipeline execution 
 GENERAL_FOLDER=geocint
 # directories that should be added to env
 OPTIONAL_DIRECTORIES=''
-# name of your private repositry
+# name of your private repository
 PRIVATE_REPO_NAME=geocint-private
 
 # updates block
-# set to true to pull geocint-runner repo before each run
+# set to true to pull the geocint-runner repo before each run
 UPDATE_RUNNER=false
-# set to true to pull geocint-openstreetmap repo before each run
+# set to true to pull the geocint-openstreetmap repo before each run
 UPDATE_OSM_LOGIC=false
 # set to true to pull your repo before each run
 UPDATE_PRIVATE=true
 
 # targets block
-# list of targets that will be runned automatically
+# list of targets that will be run automatically
 RUN_TARGETS='your_final_target'
 
 # slack integration
-# name of slack channel for sending messages from pipeline
+# name of the slack channel for sending messages from the pipeline
 SLACK_CHANNEL=slack_channel
-# name of slack bot for sending messages from pipeline
-# Use "" when your bot name consists whitespaces
+# name of the slack bot for sending messages from the pipeline
+# Use "" when your bot name consists of whitespaces
 SLACK_BOT_NAME="Your bot name"
-# name of slack emoji that will be used as bot's avatar for sending messages from pipeline
+# name of the slack emoji that will be used as the bot's avatar for sending messages from the pipeline
 SLACK_BOT_EMOJI=cat
-# slack integration token, replace 'your_slack_key' with your slack integration key
+# this is a slack integration token, replace 'your_slack_key' with your slack integration key
 SLACK_KEY=your_slack_key
 
 # ignored files
-# this variable contains filenames, that should be ignored in copy process
-# add here names of files that duplicated between geocint-runner, geocint-openstreetmap and your private repository
-# that files will not be copy from all repositories
+# this variable contains filenames, that should be ignored in the copy process
+# add here are the names of the files that got duplicated between geocint-runner, geocint-openstreetmap and your private repository
+# this files will not be copied from all the repositories
 # Use ',' as a delimiter
-# By default this variable contain README.md and LICENSE files that have duplicates
-# Keep in mind that if you want to add file you should remove from filepath repository
+# By default this variable contains README.md and LICENSE files that have duplicates
+# Keep in mind that if you want to add a file you should remove it from the file-path repository
 # eg: geocint-runner/scripts/script_do_smth.py >>> scripts/script_do_smth.py
 IGNORE_EXISTED_FILE='README.md,LICENSE'

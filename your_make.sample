@@ -1,3 +1,6 @@
+## This is an example makefile created to demonstrate how to create and use targets as part of the ETL process.
+## extract, transform, load (ETL) is a three-phase process where data is extracted, transformed (cleaned, sanitized, scrubbed)
+## and loaded into an output data container
 ## -------------- EXPORT BLOCK ------------------------
 
 # configuration file
@@ -9,30 +12,29 @@ export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d 
 export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_KEY = $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${file} | cut -d "=" -f 2)
 
-# these makefiles stored in geocint-runner and geocint-openstreetmap repositories
-# runner_make contains basic set of targets for creation project folder structure
-# osm_make contains contain set of targets for osm data processing
+# these makefiles are stored in geocint-runner and geocint-openstreetmap repositories
+# runner_make contains the basic set of targets for creating the project folder structure
+# osm_make contains a set of targets for osm data processing
 include runner_make osm_make
 
 ## ------------- CONTROL BLOCK -------------------------
 
-# replace your_final_target placeholder with the names of final target, that you will use to run pipeline
-# you can also add here the names of targets that should not be rebuilt automatically, but only when conditions are met or at your request
+# you can replace dev with the names of the final targets, that you will use to run the pipeline if you don't need all of them
+# you can also add here the names of targets that should not be rebuilt automatically, just when conditions are met or at your request
+# to do it just add these names after the colon separated by a space
 all: dev ## [FINAL] Meta-target on top of all other targets, or targets on parking.
 
 # by default the clean target is set to serve an update of the OpenStreetMap planet dump during every run
-clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-repeating targets.
+clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean non-repeating targets.
 	if [ -f data/planet-is-broken ]; then rm -rf data/planet-latest.osm.pbf ; fi
 	rm -rf data/planet-is-broken
 	profile_make_clean data/planet-latest-updated.osm.pbf
 
 ## --------------- SAMPLE TARGET CHAIN ------------------
 
-## This is an example makefile created to demonstrate how to create and use targets as part of the ETL process.
-
 ## --------------- DATA PROCESSING BLOCK ----------------
 
-db/table/fire_stations: db/index/osm_tags_idx ## Extract centroids of fire stations from osm table
+db/table/fire_stations: db/index/osm_tags_idx ## Extract centroids of fire stations from the osm table
 	# db/index/osm_tags_idx is a dependency from geocint-openstreetmap Makefile
 	# drop table if exist to avoid conflict
 	psql -c "drop table if exists fire_stations;"
@@ -49,7 +51,7 @@ db/table/fire_stations: db/index/osm_tags_idx ## Extract centroids of fire stati
 					order by osm_id \
 					);"
 	# update db/table/fire_stations time mark to be able to create the correct graph using make-profiler
-	# keep in mind that $@ is the equivalent of the name of the target containing it.
+	# keep in mind that $@ here is an equivalent of the name of the target containing it.
 	touch $@
 
 db/table/fire_stations_h3_r8: db/table/fire_stations ## Create h3 8 resolution hexagons from centroids of fire stations 
@@ -79,12 +81,12 @@ db/table/fire_stations_h3_r8_count: db/table/fire_stations_h3_r8 ## Count the nu
 
 ## ---------------- DATA EXPORT BLOCK ----------------------
 
-data/out/fire_stations: | data/out ## Create folder for data extraction
+data/out/fire_stations: | data/out ## Create a folder for data extraction
 	# data/out is a dependency from geocint-runner Makefile
 	mkdir -p $@
 
-data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz: db/table/fire_stations_h3_r8_count | data/out/fire_stations ## Extract from database to compressed gpkg file
-	# remove file if exist to avoid conflict
+data/out/fire_stations/fire_stations_h3_r8_count.gpkg.gz: db/table/fire_stations_h3_r8_count | data/out/fire_stations ## Extract from the database to a compressed gpkg file
+	# remove file if it exists to avoid conflicts
 	rm -f $@
 	rm -f data/out/fire_stations/fire_stations_h3_r8_count.gpkg
 	# extract data to gpkg file
@@ -105,9 +107,9 @@ deploy/s3/fire_stations: data/out/fire_stations/fire_stations_h3_r8_count.gpkg.g
 		--acl public-read
 	touch $@
 
-# A dev target is an example of a metatagret that depends on all chains of targtes and allows you to run the entire pipeline with only one goal running.
-# Also, this target allows you to send messages to the weak channel in case the entire pipeline was successfully completed (or you can perform any other action)
+# A dev target is an example of a meta-target that depends on all chains of targets and allows you to run the entire pipeline with only one target running.
+# Also, this target allows you to send messages to the slack channel in case the entire pipeline was successfully completed (or you can perform any other action)
 dev: deploy/s3/fire_stations ## Send a message about the successful execution of the pipeline
-	#send dev target successfully build- message to slack channel 
+	#send dev target successfully build- message to a slack channel 
 	echo "dev target successfully build" | python scripts/slack_message.py $$SLACK_CHANNEL ${SLACK_BOT_NAME} $$SLACK_BOT_EMOJI
 	touch $@
