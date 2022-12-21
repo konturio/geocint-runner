@@ -51,7 +51,7 @@ db/table/fire_stations: db/index/osm_tags_idx ## Extract centroids of fire stati
 					order by osm_id \
 					);"
 	# update db/table/fire_stations time mark to be able to create the correct graph using make-profiler
-	# keep in mind that $@ here is an equivalent of the name of the target containing it.
+	# keep in mind that $@ at Makefile is an equivalent of the name of the target containing it
 	touch $@
 
 db/table/fire_stations_h3_r8: db/table/fire_stations ## Create h3 8 resolution hexagons from centroids of fire stations 
