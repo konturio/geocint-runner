@@ -35,6 +35,7 @@ const completedTxt = "completed";
 const startedTxt = "started";
 
 let nEvents, nFail, nFrozen, nProgress = 0;
+let oldestCompleteTime;
 
 const parseCsv = async (filePath) => {
   const csvFile = fs.readFileSync(filePath)
@@ -126,13 +127,24 @@ const parseCsv = async (filePath) => {
           return el.eventType == startedTxt;
         }).length;
 
+        // find oldest completed time
+        for (var i = myJson.length - 1; i >= 0; i--) {
+          if (myJson[i].eventType === completedTxt) {
+            oldestCompleteTime = myJson[i].eventTime
+          }
+          break;
+        }
+
+
+
         resolve({
           status: myJson,
           pipeline: {
             nProgress: nProgress,
             nEvents: nEvents,
             nFail: nFail,
-            nFrozen: nFrozen
+            nFrozen: nFrozen,
+            oldestCompleteTime: oldestCompleteTime
           }
         });
       }

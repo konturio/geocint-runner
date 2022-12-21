@@ -30,7 +30,7 @@ body {
     margin-bottom: 12px;
 }
 
-#myTable {
+#statusTable {
     border-collapse: collapse;
     width: 80%;
     font-size: 18px;
@@ -44,17 +44,17 @@ body {
     line-height: 25px;
 }
 
-#myTable th {
+#statusTable th {
     text-align: left;
     padding-bottom: 12px;
 }
 
-#myTable td {
+#statusTable td {
     text-align: left;
     padding: 9px;
 }
 
-#myTable th {
+#statusTable th {
     border-bottom: 1pt solid black;
 }
 
@@ -82,7 +82,7 @@ h2 {
     color: black;
 }
 
-#stuff {
+#statusReport {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
