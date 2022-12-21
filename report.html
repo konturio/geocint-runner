@@ -1,0 +1,165 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href='report/style.css'>
+    <link href='https://fonts.googleapis.com/css?family=IBM Plex Sans Condensed' rel='stylesheet'>
+    <script src='report/sorttable.js' type="text/javascript"> </script>
+    <script src='report/script.js' type="text/javascript"> </script>
+</head>
+
+
+
+<body>
+    <div id="stuff">
+        <img class="img" src='report/Kontur_logo_main.png' />
+        <div class="vertical-center">
+            <p>PIPELINE DASHBOARD</p>
+        </div>
+    </div>
+    <h2>Pipeline Status</h2>
+    <table id="firstTable">
+        <tr>
+            <td><b>Present Status</b></td>
+            <td align="center"><b>Idle</b></td>
+        </tr>
+        <tr>
+            <td>Targets total</td>
+            <td align="center">204</td>
+        </tr>
+        <tr>
+            <td>Targets in progress</td>
+            <td align="center">0</td>
+        </tr>
+        <tr>
+            <td>Targets frozen</td>
+            <td align="center">0</td>
+        </tr>
+        <tr>
+            <td>Targets failed</td>
+            <td align="center">1</td>
+        </tr>
+        <tr>
+            <td>Oldest completed target</td>
+            <td align="center">2022-11-23 09:49:32</td>
+        </tr>
+    </table>
+    <h2>Target status</h2><a id="statusChart" target="_blank" href="make.svg">Status Chart</a></br><input type="text"
+        id="myInput" onkeyup="filterTarget()" placeholder="Search for target name.." title="Type in a name">
+</body>
+
+<script>
+    function run() {
+
+        // Creating Our XMLHttpRequest object 
+        var xhr = new XMLHttpRequest();
+
+        // Making our connection  
+        var url = 'http://localhost:5000';
+        xhr.open("GET", url, true);
+
+        // function execute after request is successful 
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+
+                let resp = JSON.parse(this.responseText);
+                let recs = resp.status;
+                let pipeline = resp.pipeline;
+
+                var mytable = "<table id='myTable' class='sortable'>";
+
+                mytable += `
+                    <tr class="header">
+                        <th>Target name</th>
+                        <th>Last completed date</th>
+                        <th>Status</th>
+                        <th>Status date</th>
+                        <th>Duration</th>
+                        <th>Log</th>
+                    </tr>`
+
+                for (var i = 0; i < recs.length; i++) {
+                    mytable += "<tr class=" + recs[i].eventType + ">";
+
+                    mytable += "<td>" + recs[i].eventN + "</td>";
+                    mytable += "<td>" + formatDate(recs[i].lastEventTime) + "</td>";
+                    mytable += "<td>" + recs[i].eventType + "</td>";
+                    mytable += "<td>" + formatDate(recs[i].eventTime) + "</td>";
+                    mytable += "<td>" + getTime(recs[i].eventDuration) + "</td>";
+                    mytable += "<td>...</td></tr>";
+                }
+
+                mytable += "</table></table>";
+
+                appendHtml(document.body, mytable);
+            }
+        }
+        // Sending our request 
+        xhr.send();
+    }
+
+    function appendHtml(el, str) {
+        var div = document.createElement('div');
+        div.innerHTML = str;
+        while (div.children.length > 0) {
+            el.appendChild(div.children[0]);
+        }
+    }
+
+    function formatDate(date) {
+        date = new Date(date);
+        var aaaa = date.getUTCFullYear();
+        var gg = date.getUTCDate();
+        var mm = (date.getUTCMonth() + 1);
+
+        if (gg < 10)
+            gg = "0" + gg;
+
+        if (mm < 10)
+            mm = "0" + mm;
+
+        var cur_day = aaaa + "-" + mm + "-" + gg;
+
+        var hours = date.getUTCHours()
+        var minutes = date.getUTCMinutes()
+        var seconds = date.getUTCSeconds();
+
+        if (hours < 10)
+            hours = "0" + hours;
+
+        if (minutes < 10)
+            minutes = "0" + minutes;
+
+        if (seconds < 10)
+            seconds = "0" + seconds;
+
+        return cur_day + " " + hours + ":" + minutes + ":" + seconds;
+
+    }
+
+    const getTime = (time) => {
+        seconds = Math.floor(time);
+        minutes = Math.floor(seconds / 60);
+        hours = Math.floor(minutes / 60);
+        days = Math.floor(hours / 24);
+        hours = hours - (days * 24);
+        minutes = minutes - (days * 24 * 60) - (hours * 60);
+        seconds = seconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
+
+        if (hours < 10)
+            hours = "0" + hours;
+
+        if (minutes < 10)
+            minutes = "0" + minutes;
+
+        if (seconds < 10)
+            seconds = "0" + seconds;
+
+        return hours + ":" + minutes + ":" + seconds
+    }
+
+    run();
+
+
+</script>
+
+</html>
