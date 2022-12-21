@@ -197,7 +197,7 @@ clean: ## [FINAL] Cleans the worktree for next nightly run. Does not clean non-r
 	rm -rf data/planet-is-broken
 	profile_make_clean data/planet-latest-updated.osm.pbf data/in/some.tiff
 ```
-It means that before each run Makefile will remove data/in/some.tiff if it exists and rebuild the data and all the targets, that are in the list of dependencies 
+It means that before each run make-profiler will remove data/in/some.tiff if it exists and rebuild the data and all the targets, that are in the list of dependencies 
 (will check dependencies recursively).
 
 If you do not want to rebuild this chain, just make sure that your chain doesn’t depend on targets from the clean target. This method can be useful when you have a large dataset that has not been updated recently and requires heavy and time-consuming pre-processing. In such a case, you'd probably want to prepare the data and load it to the database once not repeating this work without changing the input data.
