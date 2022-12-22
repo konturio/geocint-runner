@@ -14,6 +14,8 @@ Geocint consists of 3 different parts:
 to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
+![image](https://user-images.githubusercontent.com/810638/209176952-826382d6-35bc-469a-adaa-ef265cfdd9ac.png)
+
 ### Technology stack:
 
 - A high-performance computer. OS:the latest Ubuntu version (not necessarily LTS).
@@ -36,8 +38,11 @@ https://tldp.org/LDP/abs/html/
 - h3_pg for hexagon grid manipulation, https://github.com/bytesandbrains/h3-pg. When googling for manuals make sure you
   use this specific extension.
 - aws-cli is used to deploy data into s3 buckets or get inputs from there. https://docs.aws.amazon.com/cli/index.html
-- python3 is used for small tasks like unpivoting source data.
+- python is used for small tasks like unpivoting source data.
 - GDAL, OGR, osm-c-tools, osmium, and others are used if they are needed in Bash CLI.
+
+
+[Install, first run guides and best practices](DOCUMENTATION.md) 
 
 ### Directory and file structure:
 
@@ -108,6 +113,11 @@ sudo pip3 install slack slackclient
 7. Run ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
 
 8. Add connection settings to the pg_hba.conf
+
+``shell
+sudo nano /etc/postgresql/14/main/pg_hba.conf
+```
+
 `local   gis +geocint_users  trust`
 
 9. Create postgresql role and create postgresql extensions:
