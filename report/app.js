@@ -3,6 +3,7 @@ const Papa = require('papaparse');
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+path = require('path')
 
 const app = express();
 
@@ -22,7 +23,9 @@ app.get('/', async function (req, res) {
 //add idle, all status, etc
 //set log url
 
-const csvFilePath = 'make_profile.db'
+const csvFilePath = path.join(__dirname, 'make_profile.db');
+//TODO change date
+const daysBack = 45;
 const logFileName = "failed.touch"
 const recTime = 0;
 const recLog = 1;
@@ -36,6 +39,7 @@ const startedTxt = "started";
 
 let nEvents, nFail, nFrozen, nProgress = 0;
 let oldestCompleteTime;
+let presentStatus = "Idle"
 
 const parseCsv = async (filePath) => {
   const csvFile = fs.readFileSync(filePath)
@@ -46,8 +50,8 @@ const parseCsv = async (filePath) => {
     Papa.parse(csvData, {
       delimiter: " ",
       complete: results => {
-        //TODO change date
-        const sevenDaysAgo = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000)
+        //lots of dates on logs. filter it
+        const daysLimited = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000)
 
         //all make_profile.db data
         let records = results.data;
@@ -56,7 +60,7 @@ const parseCsv = async (filePath) => {
           let eTime = new Date(rec[recTime] * 1000);
 
           //get only event names in defined days
-          if (eTime > sevenDaysAgo) {
+          if (eTime > daysLimited) {
             let newItem = {
               eventN: rec[recEventName],
               eventType: null,
@@ -127,6 +131,10 @@ const parseCsv = async (filePath) => {
           return el.eventType == startedTxt;
         }).length;
 
+        if (nProgress > 0) {
+          presentStatus = "not finished"
+        }
+
         // find oldest completed time
         for (var i = myJson.length - 1; i >= 0; i--) {
           if (myJson[i].eventType === completedTxt) {
@@ -135,8 +143,6 @@ const parseCsv = async (filePath) => {
           break;
         }
 
-
-
         resolve({
           status: myJson,
           pipeline: {
@@ -144,7 +150,8 @@ const parseCsv = async (filePath) => {
             nEvents: nEvents,
             nFail: nFail,
             nFrozen: nFrozen,
-            oldestCompleteTime: oldestCompleteTime
+            oldestCompleteTime: oldestCompleteTime,
+            presentStatus: presentStatus
           }
         });
       }

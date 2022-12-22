@@ -34,6 +34,7 @@ function filterTarget() {
     }
 }
 
+//refresh page every 5 minutes
 setTimeout(function () {
     window.location.reload(1);
 }, 1000 * 5 * 60);
@@ -67,7 +68,7 @@ function doRequest() {
                 <table id="firstTable">
                     <tr>
                         <td><b>Present Status</b></td>
-                        <td align="center"><b>Idle</b></td>
+                        <td align="center"><b>` + pipeline.presentStatus + `</b></td>
                     </tr>
                     <tr>
                         <td>Targets total</td>

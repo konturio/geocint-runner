@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  geocintrunner:
+    image: geocintrunner
+    build:
+      context: report
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 5000:5000
+volumes:
+  - /Users/saricicek/Documents/Kontur/geocint-runner/make_profile.db:/usr/src/app/make_profile.db
