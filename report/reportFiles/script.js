@@ -113,7 +113,8 @@ function doRequest() {
                 statusTable += "<td>" + recs[i].eventType + "</td>";
                 statusTable += "<td>" + formatDate(recs[i].eventTime) + "</td>";
                 statusTable += "<td>" + getTime(recs[i].eventDuration) + "</td>";
-                statusTable += "<td>...</td></tr>";
+                statusTable += "<td><a target='_blank' href=logs/" + recs[i].log + "/" + recs[i].eventN + "/log.txt>...</a></td>";
+
             }
 
             statusTable += "</table></table>";
@@ -121,7 +122,7 @@ function doRequest() {
             appendHtml(document.body, pipelineTable + statusTable);
         }
     }
-    // Sending our request 
+    // Sending request 
     xhr.send();
 }
 

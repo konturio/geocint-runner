@@ -20,12 +20,8 @@ app.get('/', async function (req, res) {
   res.json(await parseCsv(csvFilePath));
 });
 
-//add idle, all status, etc
-//set log url
-
 const csvFilePath = path.join(__dirname, 'make_profile.db');
-//TODO change date
-const daysBack = 45;
+const daysBack = 15;
 const logFileName = "failed.touch"
 const recTime = 0;
 const recLog = 1;
@@ -161,8 +157,7 @@ const parseCsv = async (filePath) => {
 
 const start = async () => {
   try {
-    //const appPort = config.app.port;
-    const appPort = 5000;
+    const appPort = config.app.port;
     app.listen(appPort);
     console.log('>report server is listening on port ' + appPort);
   } catch (err) {

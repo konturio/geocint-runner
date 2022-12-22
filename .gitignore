@@ -2,3 +2,5 @@
 /.vscode
 make_profile.db
 /report/node_modules
+.DS_Store
+/report/.DS_Store
