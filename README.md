@@ -14,6 +14,8 @@ Geocint consists of 3 different parts:
 to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
+![image](https://user-images.githubusercontent.com/810638/209176952-826382d6-35bc-469a-adaa-ef265cfdd9ac.png)
+
 ### Technology stack:
 
 - A high-performance computer. OS:the latest Ubuntu version (not necessarily LTS).
