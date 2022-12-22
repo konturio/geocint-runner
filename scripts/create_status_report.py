@@ -75,7 +75,7 @@ def print_html(strOutputFile, tblStatus1):
         </head>
 
         <body>
-            <div id="stuff">
+            <div id="statusReport">
                 <img class="img" src='report/Kontur_logo_main.png' />
                 <div class="vertical-center">
                     <p>PIPELINE DASHBOARD</p>
