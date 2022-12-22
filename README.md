@@ -108,6 +108,11 @@ sudo pip3 install slack slackclient
 7. Run ~/geocint-runner/runner_install.sh (necessary dependencies to run runner part)
 
 8. Add connection settings to the pg_hba.conf
+
+``shell
+sudo nano /etc/postgresql/14/main/pg_hba.conf
+```
+
 `local   gis +geocint_users  trust`
 
 9. Create postgresql role and create postgresql extensions:
