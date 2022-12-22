@@ -22,7 +22,7 @@ if len(sys.argv) < 2:
     )
 
 channel = sys.argv[1]
-username = sys.argv[2]
+username = sys.argv[2].strip('"')
 icon_emoji = sys.argv[3].strip(':')
 text = sys.stdin.read()
 blocks = None
