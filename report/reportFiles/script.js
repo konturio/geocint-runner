@@ -45,7 +45,7 @@ function doRequest() {
     var xhr = new XMLHttpRequest();
 
     // Making our connection  
-    var url = 'http://localhost:5000';
+    var url = "http://" + window.location.hostname + '/statusReport';
     xhr.open("GET", url, true);
 
     // function execute after request is successful 
@@ -59,7 +59,7 @@ function doRequest() {
             var pipelineTable =
                 `
                 <div id="statusReport">
-                    <img class="img" src='report/Kontur_logo_main.png' />
+                    <img class="img" src='reportFiles/Kontur_logo_main.png' />
                     <div class="vertical-center">
                         <p>PIPELINE DASHBOARD</p>
                     </div>
@@ -120,6 +120,8 @@ function doRequest() {
             statusTable += "</table></table>";
 
             appendHtml(document.body, pipelineTable + statusTable);
+        } else {
+            document.write("Something went wrong!");
         }
     }
     // Sending request 

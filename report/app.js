@@ -16,8 +16,12 @@ process.on('uncaughtException', err => {
   console.log(err);
 })
 
-app.get('/', async function (req, res) {
-  res.json(await parseCsv(csvFilePath));
+app.get('/statusReport', async function (req, res) {
+  if (fs.existsSync(csvFilePath)) {
+    res.json(await parseCsv(csvFilePath));
+  }
+  res.write("no db file");
+  res.end();
 });
 
 const csvFilePath = path.join(__dirname, 'make_profile.db');
