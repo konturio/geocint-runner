@@ -19,9 +19,10 @@ process.on('uncaughtException', err => {
 app.get('/statusReport', async function (req, res) {
   if (fs.existsSync(csvFilePath)) {
     res.json(await parseCsv(csvFilePath));
+  } else {
+    res.write("no db file");
+    res.end();
   }
-  res.write("no db file");
-  res.end();
 });
 
 const csvFilePath = path.join(__dirname, 'make_profile.db');
@@ -161,7 +162,7 @@ const parseCsv = async (filePath) => {
 
 const start = async () => {
   try {
-    const appPort = config.app.port;
+    const appPort = 5000;
     app.listen(appPort);
     console.log('>report server is listening on port ' + appPort);
   } catch (err) {

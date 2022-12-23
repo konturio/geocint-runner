@@ -2,11 +2,13 @@ version: '3.4'
 
 services:
   geocintrunner:
-    image: geocintrunner
+    image: statusreport
     build:
-      context: report
+      context: .
       dockerfile: ./Dockerfile
     environment:
       NODE_ENV: production
     ports:
-      - 5000:5000
+      - 9000:5000
+    volumes:
+      - /home/gis/geocint/make_profile.db:/usr/src/app/make_profile.db

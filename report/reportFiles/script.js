@@ -120,8 +120,6 @@ function doRequest() {
             statusTable += "</table></table>";
 
             appendHtml(document.body, pipelineTable + statusTable);
-        } else {
-            document.write("Something went wrong!");
         }
     }
     // Sending request 
