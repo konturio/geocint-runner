@@ -2,10 +2,10 @@
 
 # Set variables
 . ~/config.inc.sh
-export PGDATABASE
+export USER_NAME
 
-PSQL_SELECT='psql -t -A -U $PGDATABASE -c'
-PSQL_COMMAND='psql -q -U $PGDATABASE -c'
+PSQL_SELECT='psql -t -A -U $USER_NAME -c'
+PSQL_COMMAND='psql -q -U $USER_NAME -c'
 
 username=$1
 
