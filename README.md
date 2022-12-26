@@ -74,7 +74,7 @@ geocint-openstreetmap and your own chains of targets
 1. Create your repository to store your own part of the pipeline.
 Your repository should contain the following required files:
 - README.md (could be empty, just make sure that it exists)
-- install.sh (use [runner_install.sh](runner_install.sh) as an example, store installation of your additional dependencies)
+- install.sh (use [runner-install.sh](runner-install.sh) as an example, store installation of your additional dependencies)
 - your_make (use [private_make.sample](your_make.sample) as an example; keep in mind that make shouldn't be named "Makefile",
 use the other name to keep compatibility with geocint-runner repository)
 
