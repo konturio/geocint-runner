@@ -8,7 +8,7 @@
     * How start_geocint.sh works
     * How to write targets
     * User schemas in the database
-    * How to analyse the build time for tables
+    * How to analyse the build time for targets
 * Make-profiler
 * Best practices of using
 
@@ -16,7 +16,7 @@
 
 Geocint consists of 3 different parts:
 - [geocint-runner](https://github.com/konturio/geocint-runner) - a core part of the pipeline, includes utilities and initial Makefile
-- [geocint-openstreetmap](https://github.com/konturio/geocint-runner) - a chain of targets for downloading, updating and uploading
+- [geocint-openstreetmap](https://github.com/konturio/geocint-openstreetmap) - a chain of targets for downloading, updating and uploading
 to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
@@ -31,30 +31,30 @@ Then start_geocint.sh will copy files from all these repositories to ~/geocint f
 In general case ~/geocint folder includes the next files and folders :
 - [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
   posting info messages
-- [runner_install.sh](runner_install.sh) - script, that runs installation of required packages of the geocint-runner part
+- [runner-install.sh](runner-install.sh) - script, that runs installation of required packages of the geocint-runner part
 - [config.inc.sh.sample](config.inc.sh.sample) - a sample config file
 - [runner_make](runner_make) - map dependencies between data generation stages
 - [osm_make](runner_make) - makefile with a set of targets
 - [your_make.sample](your_make.sample) - sample makefile that shows how to integrate geocint-runner, 
 geocint-openstreetmap and your own chains of targets
-- [functions/](functions) - service SQL functions, used in more than one other file
-- [procedures/](procedures) - service SQL procedures, used in more than one other file
+- functions/ - service SQL functions, used in more than one other file
+- procedures/ - service SQL procedures, used in more than one other file
 - [scripts/](scripts) - scripts that perform data transformation
-- [tables/](tables) - SQL-code, which generates a table
-- [static_data](static_data) - static file-based data stored in the geocint repository
+- tables/ - SQL-code, which generates tables
+- static_data/ - static file-based data stored in the geocint repository
 All these folders and files are removed and recreated each time the geocint pipeline starts. 
 
 After running the pipeline, Makefile will create additional folders and files. These folders are used to store input (in folder), intermediate (mid folder), and output (out folder) data files:
-- [data/](data) - file-based input, middle, output data.
+- data/ - file-based input, middle, output data.
 	- data/in - all input data, downloaded elsewhere
 	- data/in/raster - all downloaded GeoTIFFs
 	- data/mid - all intermediate data (retiles, unpacks, reprojections, etc.) which can be removed after
   	each launch
 	- data/out - all generated final data (tiles, dumps, unloading for the clients, etc.)
-- [db/](db) - files - Makefile mark about executing "db/..." targets
-- [deploy/](deploy) - files - Makefile mark about executing "deploy/..." targets
-- [logs/](logs) - files - files with targets execution logs
-- [report/](report) - folder to store HTML reports.
+- db/- files - Makefile mark about executing "db/..." targets
+- deploy/ - files - Makefile mark about executing "deploy/..." targets
+- logs/ - files - files with targets execution logs
+- report/ - folder to store HTML reports.
 
 These folders are not deleted or re-created each time the geocint pipeline runs to avoid rebuilding targets that should not be rebuilt every time (if you want to rebuild some targets chain each time please see How geocint pipeline works in this doc).
 You shouldn’t store all your input datasets in data/in/ folder. To make your data storage more organized, you can create additional folders for separate data sources (for example data/in/source_name). This rule also applies to other catalogs.
@@ -220,7 +220,7 @@ are added to the geocint_users group role. You need to add the following line to
 
 `local   gis +geocint_users  trust`
 
-### How to analyse build time for tables
+### How to analyse build time for targets
 
 Logs for every build are stored in `/home/gis/geocint/logs`
 
@@ -278,15 +278,15 @@ There are a few simple rules, follow them to avoid troubles during the creation 
 * Don’t use double quotes in comments (make-profile will be broken);
 * Try to avoid views and materialized views;
 * Complex python scripts should become less complex bash+sql scripts;
-* Make sure you have source data always available. Do not store it locally on geocint - add a target to download data from S3 at least (you can still store data in a special folder - /static_data, but try to avoid storing important data without a remote backup);
+* Make sure you have source data always available. Do not store it locally on server - add a target to download data from S3 at least (you can still store data in a special folder - /static_data, but try to avoid storing important data without a remote backup);
 * Try to run the pipeline at least once on your test branch, or create a simple short makefile for test_* tables in a separate folder and run it, avoiding the effect on running the pipeline;
-* Make sure your scripts (especially bash, ansible) work as a part of Makefile, not only by themselves (inside of Makefile you should use $$ instead of $ to access a variable);
+* Make sure your scripts (especially bash, ansible) work as a part of Makefile, not only by themselves. For example, you have to use $$ instead of $ to access a variable inside Makefile;
 * Check idempotence: how will it run the first time? Second time? 100 times?;
-* Be careful with the copying of non-existing yet files;
+* Be careful with the copying and removing of non-existing yet files: it should be forced operation;
 * Be careful with deleting or renaming functions and procedures, especially when you change the number or order of parameters;
 * Try to use drop/alter database_object with IF EXIST option;
 * Define: does your target need to be launched every day? Don’t forget to put it into the Clean one. Or make it manually (see Cache invalidation);
-* If you replace one target with another one, make sure you deleted unused one everywhere;
+* When replacing a target with another, ensure that the unused one has been deleted from all locations;
 * Updates on tables should be a part of the target, where these tables are created, for not updating something twice;
 * When you add a new functionality and modify existing targets do cache invalidation: manual cleaning of currently updated but existing targets;
 * Delete local/S3 files and DB objects that you don’t need anymore.
