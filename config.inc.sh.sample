@@ -1,5 +1,5 @@
 # general variables
-# your user name, which will be used also as a Postgresql role name and a Postfresql database name
+# your user name, which will be used also as a Postgresql role name and a Postgresql database name
 USER_NAME='gis'
 
 # variable to store additional paths, that should be added to the PATH variable
@@ -37,7 +37,7 @@ SLACK_KEY=your_slack_key
 
 # ignored files
 # this variable contains filenames, that should be ignored in the copy process
-# add here are the names of the files that got duplicated between geocint-runner, geocint-openstreetmap and your private repository
+# added here are the names of the files that got duplicated between geocint-runner, geocint-openstreetmap and your private repository
 # this files will not be copied from all the repositories
 # Use ',' as a delimiter
 # By default this variable contains README.md and LICENSE files that have duplicates
