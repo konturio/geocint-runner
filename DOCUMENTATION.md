@@ -107,7 +107,7 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
-3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token and store it in the `SLACK_KEY` variable in the file `~/.profile`.
+3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token and store it in the `SLACK_KEY` variable in the file `~/.profile`. The angle brackets around your_key need to be removed.
 ```shell
 export SLACK_KEY=<your_key>
 ```
@@ -115,14 +115,14 @@ export SLACK_KEY=<your_key>
 ```shell
 cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
 ```
-Open ~/config.inc.sh and set the necessary values for variables.
+Open ~/config.inc.sh and set the necessary values for variables. See comments at this file for details.
 
 5. Run installers:
 - ~/geocint-runner/runner_install.sh (necessary dependencies to run a runner part)
 - ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run a runner part)
 - ~/geocint-runner/scripts/set_mods.sh (create /public_html and /domlogs folders and set access modes)
 
-6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different) :
+6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different). Follow the next steps below :
 ```shell
 	# open psql console by admin (user postgres)
 	sudo -u postgres psql
