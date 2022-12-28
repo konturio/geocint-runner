@@ -120,7 +120,7 @@ Open ~/config.inc.sh and set the necessary values for variables.
 5. Run installers:
 - ~/geocint-runner/runner_install.sh (necessary dependencies to run a runner part)
 - ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run a runner part)
-- ~/geocint-runner/set_mods.sh (create /public_html and /domlogs folders and set access modes)
+- ~/geocint-runner/scripts/set_mods.sh (create /public_html and /domlogs folders and set access modes)
 
 6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different) :
 ```shell
