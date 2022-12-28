@@ -107,7 +107,7 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
-3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token and store it in the `SLACK_KEY` variable in the file `~/.profile`. The square brackets around your_key need to be removed.
+3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token and store it in the `SLACK_KEY` variable in the file `~/.profile`. The angle brackets around your_key need to be removed.
 ```shell
 export SLACK_KEY=<your_key>
 ```
