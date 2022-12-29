@@ -149,7 +149,7 @@ Please also note, that installers are run automatically, when the pipeline is st
 0 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
 add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
-* /5 * * * * cd /home/gis/geocint/ && profile_make
+\*/5 * * * * cd /home/gis/geocint/ && profile_make
 
 ### First run
 
