@@ -158,6 +158,7 @@ add the following line to regenerate make.svg every 5 minutes; make.svg is a fil
 
 To automatically start the full pipeline, set the preferred time in the crontab installation.
 For example, to run the pipeline at 12:34 set
+
 34 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
 if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "gis" with your username:
