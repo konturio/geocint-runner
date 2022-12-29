@@ -21,7 +21,9 @@ to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
 During the installation process, you should clone all these repositories to ~/.
+
 During the installation of the geocint pipeline the next folders will be created in your home directory (~/):
+
 - [public_html] - any public html that you want to share
 - [domlogs] - access and errors logs for files from the public_html folder
 
@@ -149,6 +151,7 @@ Please also note, that installers are run automatically, when the pipeline is st
 0 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
 add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
+
 \*/5 * * * * cd /home/gis/geocint/ && profile_make
 
 ### First run
