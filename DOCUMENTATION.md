@@ -139,6 +139,8 @@ Open ~/config.inc.sh and set the necessary values for variables. See comments at
 	create extension h3;
 	create extension h3_postgis;
 	# create any additional extension, that you need
+	# quit psql console
+	\q
 ```
 7. Set the crontab to autostart the pipeline. Add to [crontab settings](https://man7.org/linux/man-pages/man5/crontab.5.html) the next lines (keep in mind, that you should replace "gis" with your username):
 0 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
