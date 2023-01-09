@@ -69,8 +69,8 @@ def copy_folder_structure(directory, general_folder):
         os.makedirs(path, exist_ok=True)
     
 def main():
-    ignore_list = get_config_variable('config.inc.sh','IGNORE_EXISTED_FILE',',')
-    general_folder = get_config_variable('config.inc.sh','GENERAL_FOLDER',',')
+    ignore_list = get_config_variable(str(os.getenv('GEOCINT_WORK_DIRECTORY'))+'config.inc.sh','IGNORE_EXISTED_FILE',',')
+    general_folder = get_config_variable(str(os.getenv('GEOCINT_WORK_DIRECTORY'))+'config.inc.sh','GENERAL_FOLDER',',')
     
     # create list with non-ignored files from all repositories  
     files = []    
