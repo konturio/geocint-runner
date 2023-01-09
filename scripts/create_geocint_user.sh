@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # Set variables
-. ~/config.inc.sh
-export USER_NAME
+. ${GEOCINT_WORK_DIRECTORY}/config.inc.sh
+export PGUSER
 
-PSQL_SELECT='psql -t -A -U $USER_NAME -c'
-PSQL_COMMAND='psql -q -U $USER_NAME -c'
+PSQL_SELECT='psql -t -A -U $PGUSER -c'
+PSQL_COMMAND='psql -q -U $PGUSER -c'
 
 username=$1
 
