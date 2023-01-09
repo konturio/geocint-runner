@@ -1,6 +1,13 @@
 # general variables
-# your user name, which will be used also as a Postgresql role name and a Postgresql database name
-USER_NAME='gis'
+# set path to pipeline working directory
+GEOCINT_WORK_DIRECTORY=/home/pipeline/worked_directory/
+# set name of postgres database
+PGDATABASE=gis
+# set name of postgres user
+PGUSER=gis
+
+# set to true to check installation scripts before each run
+CHECK_INSTALLATIONS_BEFORE_RUN=true
 
 # variable to store additional paths, that should be added to the PATH variable
 # replase "gis" with your user name

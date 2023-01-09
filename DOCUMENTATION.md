@@ -20,17 +20,17 @@ Geocint consists of 3 different parts:
 to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
-During the installation process, you should clone all these repositories to ~/.
+During the installation process, you should clone all these repositories to working directory.
 
-During the installation of the geocint pipeline the next folders will be created in your home directory (~/):
+During the installation of the geocint pipeline the next folder will be created in your working directory:
 
 - [public_html] - any public html that you want to share
-- [domlogs] - access and errors logs for files from the public_html folder
 
 Then start_geocint.sh will copy files from all these repositories to ~/geocint folder. Geocint folder will be the working folder for the geocint pipeline
 (you can set any other name for this folder with the GENERAL_FOLDER variable in confic.inc.sh file)
 
 In general case ~/geocint folder includes the next files and folders :
+- [scripts/Makefile](scripts/Makefile) - makefile for geocint installation
 - [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
   posting info messages
 - [runner-install.sh](runner-install.sh) - script, that runs installation of required packages of the geocint-runner part
@@ -79,7 +79,7 @@ Your Makefile should start with export block:
 ## -------------- EXPORT BLOCK ------------------------
 
 # configuration file
-file := ~/config.inc.sh
+file := ${GEOCINT_WORK_DIRECTORY}config.inc.sh
 # Add an export here for each variable from the configuration file that you are going to use in the targets.
 export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
@@ -107,51 +107,26 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 ```
 
-1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
-2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
-3. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
+1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
+2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to working directory.
+3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token (you will set this token later to the `SLACK_KEY` variable in the file config.inc.sh.
+4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to working directory and name config.inc.sh.
 
-* Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
-* Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
-* Add it to your [channel](https://slack.com/help/articles/202035138-Add-apps-to-your-Slack-workspace);
-* [Get the Bot User OAuth Token](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md#4-copy-oauth-access-token--use-in-azure-pipelines) n e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the SLACK_KEY variable in the file config.inc.sh. The angle brackets around your_key are in need to be removed.
+Then open config.inc.sh and set the necessary values for variables. See comments at this file for details.
 
-4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to ~/:
+5. Run installation:
 ```shell
-cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
+	# install cmake if not exists
+	sudo apt install -y cmake
+	# move to the folder with installation Makefile
+	cd /your/working/directory/geocint-runner/scripts/
+	# run installation (you should set path to config.inc.sh file)
+	make install configuration_file=/your/working/directory/config.inc.sh
+	# reload ~/.bashrc file
+	source ${HOME}/.bashrc
 ```
-Open ~/config.inc.sh and set the necessary values for variables. See comments at this file for details.
 
-5. Run installers:
-
-- ~/geocint-runner/runner-install.sh (necessary dependencies to run a runner part)
-- ~/geocint-openstreetmap/openstreetmap-install.sh (necessary dependencies to run a runner part)
-- ~/[geocint-private]/install.sh (Do not forget to install any of your custom dependancies, if any. Change [geocint-private] to the name of your private repository. )
-- ~/geocint-runner/scripts/set_modes.sh (create /public_html and /domlogs folders and set access modes)
-
-Please also note, that installers are run automatically, when the pipeline is started via start_geocint.sh
-
-6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different). Follow the next steps below :
-```shell
-	# open psql console by admin (user postgres)
-	sudo -u postgres psql
-	# create role and database
-	create role gis login;
-	create database gis owner gis;
-	# connect to database
-	\c gis
-	# create extensions
-	create extension postgis;
-	create extension postgis_raster;
-	create extension postgis_sfcgal;
-	create extension postgis_topology;
-	create extension h3;
-	create extension h3_postgis;
-	# you can create any additional extension, that you need
-	# quit psql console
-	\q
-```
-7. Set the crontab to autostart the pipeline. 
+6. Set the crontab to autostart the pipeline. 
 
 To set up your crontab to start the pipeline automatically, you need to:
 * open crontab `crontab -e`. If you are trying to use crontab for the first time, please read this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
@@ -182,7 +157,7 @@ bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_dir
 
 After start_geocint.sh is run, it imports the variables from the configuration file ~/config.inc.sh. 
 It will then check the update flags in ~/config.inc.sh and git pull the repositories that have the flag set to “true”. 
-Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name for this folder in ~/config.inc.sh file with $GENERAL_FOLDER variable.
+Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name for this folder in /your_working_directory/config.inc.sh file with $GENERAL_FOLDER variable.
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets
