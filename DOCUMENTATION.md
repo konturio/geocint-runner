@@ -111,9 +111,10 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
 3. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
 
-* Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel)
-* Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md) 
-* Add it to a channel, get the Bot User OAuth Token e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the `SLACK_KEY` variable in the file config.inc.sh. The angle brackets around your_key need to be removed.
+* Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
+* Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
+* Add it to a channel;
+* Get the Bot User OAuth Token e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the `SLACK_KEY` variable in the file config.inc.sh. The angle brackets around your_key need to be removed.
 
 4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to ~/:
 ```shell
