@@ -109,10 +109,13 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
-3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md), add it to a channel, get the Bot User OAuth Token e.g. 'xoxb-111-222-xxxxx' and store it in the `SLACK_KEY` variable in the file `~/.profile`. The angle brackets around your_key need to be removed.
-```shell
-export SLACK_KEY=<your_key>
-```
+3. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
+
+* Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
+* Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
+* Add it to your [channel](https://slack.com/help/articles/202035138-Add-apps-to-your-Slack-workspace);
+* [Get the Bot User OAuth Token](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md#4-copy-oauth-access-token--use-in-azure-pipelines) n e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the SLACK_KEY variable in the file config.inc.sh. The angle brackets around your_key are in need to be removed.
+
 4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to ~/:
 ```shell
 cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
