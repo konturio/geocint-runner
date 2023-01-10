@@ -113,7 +113,7 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 * Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
 * Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
-* Add it to a channel;
+* Add it to a [channel](https://slack.com/help/articles/202035138-Add-apps-to-your-Slack-workspace);
 * Get the Bot User OAuth Token e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the `SLACK_KEY` variable in the file config.inc.sh. The angle brackets around your_key need to be removed.
 
 4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to ~/:
