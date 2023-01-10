@@ -37,7 +37,7 @@ SLACK_KEY=your_slack_key
 
 # ignored files
 # this variable contains filenames, that should be ignored in the copy process
-# added here are the names of the files that got duplicated between geocint-runner, geocint-openstreetmap and your private repository
+# add here the names of the files that got duplicated between geocint-runner, geocint-openstreetmap and your private repository
 # this files will not be copied from all the repositories
 # Use ',' as a delimiter
 # By default this variable contains README.md and LICENSE files that have duplicates
