@@ -143,7 +143,7 @@ Please also note, that installers are run automatically, when the pipeline is st
 	create extension postgis_topology;
 	create extension h3;
 	create extension h3_postgis;
-	# create any additional extension, that you need
+	# you can create any additional extension, that you need
 	# quit psql console
 	\q
 ```
