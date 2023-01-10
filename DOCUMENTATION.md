@@ -109,7 +109,7 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
-3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token and store it in the `SLACK_KEY` variable in the file `~/.profile`. The angle brackets around your_key need to be removed.
+3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md), add it to a channel, get the Bot User OAuth Token e.g. 'xoxb-111-222-xxxxx' and store it in the `SLACK_KEY` variable in the file `~/.profile`. The angle brackets around your_key need to be removed.
 ```shell
 export SLACK_KEY=<your_key>
 ```
@@ -123,7 +123,7 @@ Open ~/config.inc.sh and set the necessary values for variables. See comments at
 - ~/geocint-runner/runner-install.sh (necessary dependencies to run a runner part)
 - ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run a runner part)
 - ~/[geocint-private]/install.sh ( Do not forget to install any of your custom dependancies, if any. Change [geocint-private] to the name of your private repository. )
-- ~/geocint-runner/scripts/set_mods.sh (create /public_html and /domlogs folders and set access modes)
+- ~/geocint-runner/scripts/set_modes.sh (create /public_html and /domlogs folders and set access modes)
 
 Please also note, that installers are run automatically, when the pipeline is started via start_geocint.sh
 
