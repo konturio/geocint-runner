@@ -10,7 +10,7 @@ tested by other team members, and will automatically produce new artifacts once 
 
 Geocint consists of 3 different parts:
 - [geocint-runner](https://github.com/konturio/geocint-runner) - a core part of the pipeline, includes utilities and initial Makefile
-- [geocint-openstreetmap](https://github.com/konturio/geocint-runner) - a chain of targets for downloading, updating and uploading 
+- [geocint-openstreetmap](https://github.com/konturio/geocint-openstreetmap) - a chain of targets for downloading, updating and uploading 
 to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 

@@ -21,7 +21,9 @@ to database OpenStreetMap planet dump
 - [geocint-private] any repository that contains your additional functionality
 
 During the installation process, you should clone all these repositories to ~/.
+
 During the installation of the geocint pipeline the next folders will be created in your home directory (~/):
+
 - [public_html] - any public html that you want to share
 - [domlogs] - access and errors logs for files from the public_html folder
 
@@ -118,9 +120,12 @@ cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
 Open ~/config.inc.sh and set the necessary values for variables. See comments at this file for details.
 
 5. Run installers:
-- ~/geocint-runner/runner_install.sh (necessary dependencies to run a runner part)
+- ~/geocint-runner/runner-install.sh (necessary dependencies to run a runner part)
 - ~/geocint-openstreetmap/openstreetmap_install.sh (necessary dependencies to run a runner part)
+- ~/[geocint-private]/install.sh ( Do not forget to install any of your custom dependancies, if any. Change [geocint-private] to the name of your private repository. )
 - ~/geocint-runner/scripts/set_mods.sh (create /public_html and /domlogs folders and set access modes)
+
+Please also note, that installers are run automatically, when the pipeline is started via start_geocint.sh
 
 6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different). Follow the next steps below :
 ```shell
@@ -138,18 +143,22 @@ Open ~/config.inc.sh and set the necessary values for variables. See comments at
 	create extension postgis_topology;
 	create extension h3;
 	create extension h3_postgis;
-	# you can create any additional extension you need
+	# you can create any additional extension, that you need
+	# quit psql console
+	\q
 ```
 7. Set the crontab to autostart the pipeline. Add to [crontab settings](https://man7.org/linux/man-pages/man5/crontab.5.html) the next lines (keep in mind, that you should replace "gis" with your username):
 0 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
 add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
-* /5 * * * * cd /home/gis/geocint/ && profile_make
+
+\*/5 * * * * cd /home/gis/geocint/ && profile_make
 
 ### First run
 
 To automatically start the full pipeline, set the preferred time in the crontab installation.
 For example, to run the pipeline at 12:34 set
+
 34 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
 
 if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "gis" with your username:
