@@ -109,7 +109,10 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to working directory.
-3. The geocint pipeline should send messages to the Slack channel. Create a channel, generate a Slack token (you will set this token later to the `SLACK_KEY` variable in the file config.inc.sh.
+3. The geocint pipeline [should send messages](https://api.slack.com/messaging/sending) to the Slack channel. 
+
+Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel), generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md), add it to a channel, get the Bot User OAuth Token e.g. 'xoxb-111-222-xxxxx' and store it in the `SLACK_KEY` variable in the file config.inc.sh. The angle brackets around your_key need to be removed.
+
 4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to working directory and name config.inc.sh.
 
 Then open config.inc.sh and set the necessary values for variables. See comments at this file for details.
