@@ -79,7 +79,7 @@ Your Makefile should start with export block:
 ## -------------- EXPORT BLOCK ------------------------
 
 # configuration file
-file := ${GEOCINT_WORK_DIRECTORY}config.inc.sh
+file := ${GEOCINT_WORK_DIRECTORY}/config.inc.sh
 # Add an export here for each variable from the configuration file that you are going to use in the targets.
 export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
