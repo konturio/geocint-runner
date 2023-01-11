@@ -168,9 +168,9 @@ For example, to run the pipeline to run your pipeline every night at midnight se
 
 0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt
 
-if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "gis" with your username:
+if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "/your_working_directory/" with directory where you clone the 3 repositories (see point 2 for more information):
 ```shell
-bash /your_working_directorygeocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt
+bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt
 ```
 
 ## How geocint pipeline works
