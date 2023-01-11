@@ -19,64 +19,64 @@ export PRIVATE_REPO_NAME = $(shell sed -n -e '/^PRIVATE_REPO_NAME/p' ${configura
 ${GEOCINT_WORK_DIRECTORY}: ## create working directory
 	mkdir -p $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}: ${GEOCINT_WORK_DIRECTORY} ## create general_folder directory
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}: | ${GEOCINT_WORK_DIRECTORY} ## create general_folder directory
 	mkdir -p $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation: ## create installation folder to store installation process marks
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation: | ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER} ## create installation folder to store installation process marks
 	mkdir -p $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/add_congig_file_path_to_bashrc: | ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation ## write export variable to bashrc file
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/add_congig_file_path_to_bashrc: | ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation ## write export variable to bashrc file
 	sudo echo 'export GEOCINT_WORK_DIRECTORY=${GEOCINT_WORK_DIRECTORY}' >> ${HOME}/.bashrc
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/preparation_block_finished: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/add_congig_file_path_to_bashrc ## send message that preparation step finished successfully
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/preparation_block_finished: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/add_congig_file_path_to_bashrc ## send message that preparation step finished successfully
 	echo "Preparation step finished successfully"
 	touch $@
 
 
 # -------------------- DEPENDENCIES INSTALLATIONS BLOCK ----------------------
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/runner_installer: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/preparation_block_finished ## install dependencies of runner part 
-	bash ${GEOCINT_WORK_DIRECTORY}geocint-runner/runner-install.sh || echo 'runner-install.sh returned an error, check logs for more infornation'
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/runner_installer: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/preparation_block_finished ## install dependencies of runner part 
+	bash ${GEOCINT_WORK_DIRECTORY}/geocint-runner/runner-install.sh || echo 'runner-install.sh returned an error, check logs for more infornation'
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/openstreetmap_installer: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/runner_installer ## install dependencies of openstreetmap part
-	bash ${GEOCINT_WORK_DIRECTORY}geocint-openstreetmap/openstreetmap-install.sh || echo 'openstreetmap-install.sh returned an error, check logs for more infornation'
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/openstreetmap_installer: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/runner_installer ## install dependencies of openstreetmap part
+	bash ${GEOCINT_WORK_DIRECTORY}/geocint-openstreetmap/openstreetmap-install.sh || echo 'openstreetmap-install.sh returned an error, check logs for more infornation'
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/h3_pg_installation: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/openstreetmap_installer ## install h3_pg
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/h3_pg_installation: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/openstreetmap_installer ## install h3_pg
 	sudo pgxn install h3
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/private_installer: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/h3_pg_installation ## install dependencies of openstreetmap part
-	bash ${GEOCINT_WORK_DIRECTORY}${PRIVATE_REPO_NAME}/install.sh || echo 'install.sh returned an error, check logs for more infornation'
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/private_installer: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/h3_pg_installation ## install dependencies of openstreetmap part
+	bash ${GEOCINT_WORK_DIRECTORY}/${PRIVATE_REPO_NAME}/install.sh || echo 'install.sh returned an error, check logs for more infornation'
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/private_installer ## create public_html folder and set access
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/private_installer ## create public_html folder and set access
 	sudo usermod -aG adm ${USER}
 	sudo usermod -aG ${USER} www-data
-	sudo mkdir -p ${GEOCINT_WORK_DIRECTORY}public_html
-	sudo chown ${USER}:${USER} ${GEOCINT_WORK_DIRECTORY}public_html
-	sudo chmod 0750 ${GEOCINT_WORK_DIRECTORY}public_html
+	sudo mkdir -p ${GEOCINT_WORK_DIRECTORY}/public_html
+	sudo chown ${USER}:${USER} ${GEOCINT_WORK_DIRECTORY}/public_html
+	sudo chmod 0750 ${GEOCINT_WORK_DIRECTORY}/public_html
 	sudo echo 'export PATH=$$PATH:/usr/local/pgsql/bin' >> ${HOME}/.bashrc
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/installation_block_finished: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/set_modes ## send message that installation step finished successfully
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/installation_block_finished: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/set_modes ## send message that installation step finished successfully
 	echo "Installation step finished successfully"
 	touch $@
 
 
 # ------------------------ DB configuration block ----------------------------
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_user: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/installation_block_finished ## create postgresql user
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/create_user: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/installation_block_finished ## create postgresql user
 	sudo -u postgres psql -c "CREATE ROLE ${PGUSER} WITH SUPERUSER LOGIN ENCRYPTED PASSWORD '${PGUSER}pass';"
 	touch $@
 	
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_database: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_user ## create postgresql db
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/create_database: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/create_user ## create postgresql db
 	sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGUSER};"
 	touch $@
 	
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_extensions: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_database ## create postgresql extensions
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/create_extensions: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/create_database ## create postgresql extensions
 	psql -c "CREATE EXTENSION postgis;"
 	psql -c "CREATE EXTENSION postgis_raster;"
 	psql -c "CREATE EXTENSION postgis_sfcgal;"
@@ -85,12 +85,12 @@ ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_extensions: ${GEO
 	psql -c "CREATE EXTENSION h3_postgis;"
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/create_extensions ## send message that database initialisation step finished successfully
+${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/create_extensions ## send message that database initialisation step finished successfully
 	echo "Database initialisation step finished successfully"
 	touch $@
 
 
 # ------------------------ MANAGE BLOCK ---------------------------------------
 
-install: ${GEOCINT_WORK_DIRECTORY}${GENERAL_FOLDER}/installation/database_block_finished ## Target to run Geocint pipeline installation
+install: ${GEOCINT_WORK_DIRECTORY}/${GENERAL_FOLDER}/installation/database_block_finished ## Target to run Geocint pipeline installation
 	echo "Geocint pipeline successfully installed"

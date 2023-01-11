@@ -1,6 +1,6 @@
 # general variables
 # set path to pipeline working directory
-GEOCINT_WORK_DIRECTORY=/home/pipeline/worked_directory/
+GEOCINT_WORK_DIRECTORY=/home/pipeline/worked_directory
 # set name of postgres database
 PGDATABASE=gis
 # set name of postgres user
