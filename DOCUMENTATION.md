@@ -151,22 +151,30 @@ Please also note, that installers are run automatically, when the pipeline is st
 	# quit psql console
 	\q
 ```
-7. Set the crontab to autostart the pipeline. Add to [crontab settings](https://man7.org/linux/man-pages/man5/crontab.5.html) the next lines (keep in mind, that you should replace "gis" with your username):
-0 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
+7. Set the crontab to autostart the pipeline. 
 
-add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
+To set up your crontab to start the pipeline automatically, you need to:
+* open crontab `crontab -e`. If you are trying to use crontab for the first time, please read this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
+* add to crontab settings the next lines to run your pipeline every night at midnight (keep in mind, that you should replace "your_working_directory" with your working directory):
 
-\*/5 * * * * cd /home/gis/geocint/ && profile_make
+`0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
+* add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
+
+`*/5 * * * * cd /your_working_directory/geocint/ && profile_make`
+
+* save your changes and exit.
 
 ### First run
 
 To automatically start the full pipeline, set the preferred time in the crontab installation.
-For example, to run the pipeline at 12:34 set
+For example, to run the pipeline every night at midnight set
 
-34 12 * * * /bin/bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
+`0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
 
-if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "gis" with your username:
-bash /home/gis/geocint-runner/start_geocint.sh > /home/gis/geocint/log.txt
+if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "/your_working_directory/" with the directory where you cloned 3 repositories (see point 2 for more information):
+```shell
+bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt
+```
 
 ## How geocint pipeline works
 
