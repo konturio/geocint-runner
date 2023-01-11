@@ -154,7 +154,7 @@ Please also note, that installers are run automatically, when the pipeline is st
 7. Set the crontab to autostart the pipeline. 
 
 To set up your crontab to start the pipeline automatically, you need to:
-* open crontab `crontab -e`. If you try to use crontab first time, please, check this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
+* open crontab `crontab -e`. If you are trying to use crontab for the first time, please read this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
 * add to crontab settings the next lines to run your pipeline every night at midnight (keep in mind, that you should replace "your_working_directory" with your working directory):
 
 `0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
