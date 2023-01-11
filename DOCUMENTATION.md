@@ -158,7 +158,7 @@ To set up your crontab to start the pipeline automatically, you need to:
 * add to crontab settings the next lines to run your pipeline every night at midnight (keep in mind, that you should replace "your_working_directory" with your working directory):
 `0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
 * add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error) 
-`\*/5 * * * * cd /your_working_directory/geocint/ && profile_make`
+`*/5 * * * * cd /your_working_directory/geocint/ && profile_make`
 * save your changes and exit.
 
 ### First run
