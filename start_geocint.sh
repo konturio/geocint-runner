@@ -67,17 +67,17 @@ fi
 
 # Remove all files and folders except data, db, deploy and logs from the general folder 
 if [ -z "$KEEP_FOLDERS_REGEX" ]; then
-  find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type d -not -regex $KEEP_FOLDERS_REGEX | xargs rm -rf
-else
   echo "Skip start: variable KEEP_FOLDERS_REGEX not set or empty" | python ${GEOCINT_WORK_DIRECTORY}/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
   exit 1
+else
+  find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type d -not -regex $KEEP_FOLDERS_REGEX | xargs rm -rf
 fi
 
 if [ -z "$KEEP_FILES_REGEX" ]; then
-  find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type f -not -regex $KEEP_FILES_REGEX -delete
-else
   echo "Skip start: variable KEEP_FILES_REGEX not set or empty" | python ${GEOCINT_WORK_DIRECTORY}/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
   exit 1
+else
+  find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type f -not -regex $KEEP_FILES_REGEX -delete
 fi
 
 cd ${GEOCINT_WORK_DIRECTORY}
