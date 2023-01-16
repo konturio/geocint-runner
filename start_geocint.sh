@@ -106,9 +106,9 @@ profile_make clean
 
 # Check the name of the current git branch
 # the script goes into each folder and writes to the variable the name of the branch to which the repository is currently switched.
-branch_runner="$(cd ${GEOCINT_WORK_DIRECTORY}/geocint-runner; git rev-parse --abbrev-ref HEAD)"
-branch_osm="$(cd ${GEOCINT_WORK_DIRECTORY}/geocint-openstreetmap; git rev-parse --abbrev-ref HEAD)"
-branch_private="$(cd ${GEOCINT_WORK_DIRECTORY}/$PRIVATE_REPO_NAME; git rev-parse --abbrev-ref HEAD)"
+branch_runner="$(cd ${GEOCINT_WORK_DIRECTORY}/geocint-runner; git branch --show-current)"
+branch_osm="$(cd ${GEOCINT_WORK_DIRECTORY}/geocint-openstreetmap; git branch --show-current)"
+branch_private="$(cd ${GEOCINT_WORK_DIRECTORY}/$PRIVATE_REPO_NAME; git branch --show-current)"
 
 # send a message to the slack channel with run information
 echo "Geocint server: current geocint-runner branch is $branch_runner, geocint-openstreetmap branch is $branch_osm, $PRIVATE_REPO_NAME branch is $branch_private. Running $RUN_TARGETS targets." | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
