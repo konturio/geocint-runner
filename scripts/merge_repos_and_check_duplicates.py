@@ -63,14 +63,14 @@ def copy_folder_structure(directory, general_folder):
     dir_list = os.walk(directory)
     dir_list = [x[0] for x in dir_list if not search('/\.', x[0])]
     
-    folder_list = [general_folder[0]+'/'+'/'.join(x.split('/')[1:]) for x in dir_list]
+    folder_list = [general_folder+'/'+'/'.join(x.split('/')[1:]) for x in dir_list]
     
     for path in folder_list:
         os.makedirs(path, exist_ok=True)
     
 def main():
-    ignore_list = get_config_variable(str(os.getenv('GEOCINT_WORK_DIRECTORY'))+'/config.inc.sh','IGNORE_EXISTED_FILE',',')
-    general_folder = get_config_variable(str(os.getenv('GEOCINT_WORK_DIRECTORY'))+'/config.inc.sh','GENERAL_FOLDER',',')
+    ignore_list = get_config_variable(str(os.getenv('GEOCINT_WORK_DIRECTORY'))+'/config.inc.sh','ALLOW_DUPLICATE_FILES',',')
+    general_folder = 'geocint'
     
     # create list with non-ignored files from all repositories  
     files = []    
@@ -82,7 +82,7 @@ def main():
     
     # check if duplicates exist
     if len(duplicated_files) > 0:
-        sys.stdout.write(f'Skip start: duplicate files were found while copying files to a {general_folder[0]} folder: '+ ',\n'.join(duplicated_files) + '\n')
+        sys.stdout.write(f'Skip start: duplicate files were found while copying files to a {general_folder} folder: '+ ',\n'.join(duplicated_files) + '\n')
     else:
         # copy folder structure
         copy_folder_structure(runner, general_folder)
@@ -90,8 +90,8 @@ def main():
         copy_folder_structure(private, general_folder)
         # copy files
         for x in files:
-            shutil.copyfile(x, general_folder[0]+'/'+'/'.join(x.split('/')[1:]))
-        sys.stdout.write(f'Copy from {runner}, {openstreetmap} and {private} to {general_folder[0]} folder completed successfully\n')    
+            shutil.copyfile(x, general_folder+'/'+'/'.join(x.split('/')[1:]))
+        sys.stdout.write(f'Copy from {runner}, {openstreetmap} and {private} to {general_folder} folder completed successfully\n')    
  
 if __name__ == '__main__':
     main() 
