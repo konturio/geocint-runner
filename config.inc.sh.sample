@@ -9,6 +9,9 @@ PGUSER=gis
 # set to true to check installation scripts before each run
 CHECK_INSTALLATIONS_BEFORE_RUN=true
 
+KEEP_FOLDERS_REGEX='.*/\|.*/data[^.]*\|.*/db[^.]*\|.*/deploy[^.]*\|.*/logs[^.]*\|.*/reports[^.]*\|.*/installation[^.]*'
+KEEP_FILES_REGEX=".*/make_profile\.db[^.]*"
+
 # variable to store additional paths, that should be added to the PATH variable
 # replase "gis" with your user name
 PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
@@ -42,12 +45,12 @@ SLACK_BOT_EMOJI=cat
 # this is a slack integration token, replace 'your_slack_key' with your slack integration key
 SLACK_KEY=your_slack_key
 
-# ignored files
-# this variable contains filenames, that should be ignored in the copy process
+# duplicate files
+# this variable contains filenames, that may be duplicated
 # add here the names of the files that got duplicated between geocint-runner, geocint-openstreetmap and your private repository
 # this files will not be copied from all the repositories
 # Use ',' as a delimiter
 # By default this variable contains README.md and LICENSE files that have duplicates
-# Keep in mind that if you want to add a file you should remove it from the file-path repository
+# Keep in mind that if you want to add a file you should remove repository name from that file-path.
 # eg: geocint-runner/scripts/script_do_smth.py >>> scripts/script_do_smth.py
-IGNORE_EXISTED_FILE='README.md,LICENSE'
+ALLOW_DUPLICATE_FILES='README.md,LICENSE'

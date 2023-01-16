@@ -7,11 +7,11 @@ echo ${GEOCINT_WORK_DIRECTORY}
 export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE RUN_TARGETS
 export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI SLACK_KEY USER_NAME
-export CHECK_INSTALLATIONS_BEFORE_RUN
+export CHECK_INSTALLATIONS_BEFORE_RUN KEEP_FOLDERS_REGEX KEEP_FILES_REGEX
 
 # initialize the pipeline interrupt function for the case when the pipeline can't touch make.lock
 cleanup() {
-  rm -f ${GEOCINT_WORK_DIRECTORY}/$GENERAL_FOLDER/make.lock
+  rm -f ${GEOCINT_WORK_DIRECTORY}/geocint/make.lock
 }
 
 # execute installations and send a message with details if an error was returned
@@ -22,7 +22,7 @@ if [ "$CHECK_INSTALLATIONS_BEFORE_RUN" = "true" ]; then
 fi
 
 # create a working directory if it does not exist
-mkdir -p ${GEOCINT_WORK_DIRECTORY}/$GENERAL_FOLDER
+mkdir -p ${GEOCINT_WORK_DIRECTORY}/geocint
 
 # Terminate the script after failed command execution
 set -e
@@ -33,7 +33,7 @@ set -a
 $OPTIONAL_DIRECTORIES
 set +a
 
-cd ${GEOCINT_WORK_DIRECTORY}/$GENERAL_FOLDER
+cd ${GEOCINT_WORK_DIRECTORY}/geocint
 
 # send a message to the slack channel
 echo "Geocint pipeline is starting nightly build!" | python ${GEOCINT_WORK_DIRECTORY}/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
@@ -66,12 +66,23 @@ if [ "$UPDATE_PRIVATE" = "true" ]; then
 fi
 
 # Remove all files and folders except data, db, deploy and logs from the general folder 
-find ${GEOCINT_WORK_DIRECTORY}/$GENERAL_FOLDER/. -maxdepth 1 -type d -not -name  "d*" -not -name '*.*' -not -name  "logs" -not -name  "reports" -not -name  "installation" | xargs rm -rf
-find ${GEOCINT_WORK_DIRECTORY}/$GENERAL_FOLDER/ -maxdepth 1 -type f -not -name "make_profile.db" -delete
+if [ -z "$KEEP_FOLDERS_REGEX" ]; then
+  find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type d -not -regex $KEEP_FOLDERS_REGEX | xargs rm -rf
+else
+  echo "Skip start: variable KEEP_FOLDERS_REGEX not set or empty" | python ${GEOCINT_WORK_DIRECTORY}/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+  exit 1
+fi
+
+if [ -z "$KEEP_FILLES_REGEX" ]; then
+  find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type f -not -regex $KEEP_FILES_REGEX -delete
+else
+  echo "Skip start: variable KEEP_FILES_REGEX not set or empty" | python ${GEOCINT_WORK_DIRECTORY}/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+  exit 1
+fi
 
 cd ${GEOCINT_WORK_DIRECTORY}
 # Merge geocint-runner, geocint-openstreetmap and your private repo to one folder and check duplicated files
-# This script uses IGNORE_EXISTED_FILE variable from confic.inc.sh (by default it ignores README.md and LICENSE files in a root of every repo)
+# This script uses ALLOW_DUPLICATE_FILES variable from confic.inc.sh (by default it ignores README.md and LICENSE files in a root of every repo)
 copy_message="$(python geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME)"
 
 # This script sends 2 different messages. 
@@ -90,7 +101,7 @@ else
 fi
 
 # run clean target before pipeline running
-cd ${GEOCINT_WORK_DIRECTORY}/$GENERAL_FOLDER
+cd ${GEOCINT_WORK_DIRECTORY}/geocint
 profile_make clean
 
 # Check the name of the current git branch

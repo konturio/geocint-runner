@@ -163,7 +163,7 @@ bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_dir
 
 After start_geocint.sh is run, it imports the variables from the configuration file ~/config.inc.sh. 
 It will then check the update flags in ~/config.inc.sh and git pull the repositories that have the flag set to “true”. 
-Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name for this folder in /your_working_directory/config.inc.sh file with $GENERAL_FOLDER variable.
+Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder /your_working_directory/geocint.
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets
