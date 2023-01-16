@@ -72,7 +72,7 @@ Also when running the pipeline Makefile will create additional files:
 Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
 Your repository should contain the following required files:
 - install.sh (use [runner-install.sh](runner-install.sh) as an example, store installation of your additional dependencies)
-- Makefile (use [private_make.sample](your_make.sample) as an example; file to store your own additional targets chains. 
+- Makefile (use [your_make.sample](your_make.sample) as an example; file to store your own additional targets chains. 
 
 Your Makefile should start with export block:
 ```

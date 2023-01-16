@@ -73,7 +73,7 @@ else
   exit 1
 fi
 
-if [ -z "$KEEP_FILLES_REGEX" ]; then
+if [ -z "$KEEP_FILES_REGEX" ]; then
   find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type f -not -regex $KEEP_FILES_REGEX -delete
 else
   echo "Skip start: variable KEEP_FILES_REGEX not set or empty" | python ${GEOCINT_WORK_DIRECTORY}/geocint-runner/scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
