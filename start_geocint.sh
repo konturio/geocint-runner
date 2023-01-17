@@ -62,7 +62,7 @@ if [ "$UPDATE_PRIVATE" = "true" ]; then
 fi
 
 # Remove all files and folders except data, db, deploy and logs from the general folder 
-find ~/$GENERAL_FOLDER/. -maxdepth 1 -type d -not -name  "d*" -not -name '*.*' -not -name  "logs" -not -name  "reports" | xargs rm -rf
+find ~/$GENERAL_FOLDER/. -maxdepth 1 -type d -not -name  "d*" -not -name '*.*' -not -name  "logs" -not -name  "completeness_report" -not -name  "reports" | xargs rm -rf
 find ~/$GENERAL_FOLDER/ -maxdepth 1 -type f -not -name "make_profile.db" -delete
 
 cd ~/
