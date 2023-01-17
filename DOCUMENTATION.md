@@ -2,6 +2,7 @@
 
 * Geocint folder structure
 * Geocint open-source installation and first run guide
+	* How to create your custom part of pipeline
     * Installation
     * First run
 * How geocint pipeline works
@@ -18,7 +19,7 @@ Geocint consists of 3 different parts:
 - [geocint-runner](https://github.com/konturio/geocint-runner) - a core part of the pipeline, includes utilities and initial Makefile
 - [geocint-openstreetmap](https://github.com/konturio/geocint-openstreetmap) - a chain of targets for downloading, updating and uploading
 to database OpenStreetMap planet dump
-- [geocint-private] any repository that contains your additional functionality
+- [geocint-custom] any repository that contains your additional functionality
 
 During the installation process, you should clone all these repositories to working directory.
 
@@ -68,8 +69,9 @@ Also when running the pipeline Makefile will create additional files:
 
 ## Geocint open-source installation and first run guide
 
-### How to create your custom third part of pipeline
+### How to create your custom part of pipeline
 Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
+
 Since geocint consists of 3 main parts (geocint-runner, geocint-openstreetmap and your custom part) to launch the pipeline
 you will need to pull from the github to your working folder the geocinth-runner and geocinth-openstreetmap repositories.
 You can do this with the following commands:
@@ -144,7 +146,7 @@ data/out/hello_world.txt: data/out ## Create a simple txt file and say Hello Wor
 ### Installation
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
-2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to working directory.
+2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your custom repo) to working directory.
 3. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
 
 * Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
@@ -197,9 +199,9 @@ bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_dir
 
 ### How start_geocint.sh works
 
-After start_geocint.sh is run, it imports the variables from the configuration file ~/config.inc.sh. 
-It will then check the update flags in ~/config.inc.sh and git pull the repositories that have the flag set to “true”. 
-Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder /your_working_directory/geocint.
+After start_geocint.sh is run, it imports the variables from the configuration file /your_working_directory//config.inc.sh. 
+It will then check the update flags in /your_working_directory/config.inc.sh and git pull the repositories that have the flag set to “true”. 
+Next, it will merge geocint-runner, geocint-openstreetmap and your custom repository into one folder /your_working_directory/geocint.
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets
@@ -260,12 +262,12 @@ are added to the geocint_users group role. You need to add the following line to
 
 ### How to analyse build time for targets
 
-Logs for every build are stored in `/home/gis/geocint/logs`
+Logs for every build are stored in `/your_working_directory/geocint/logs`
 
 This command can show lastN {*Total times in ms*} for some {*tablename*} ordered by date
 
 ```bash
-find /home/gis/geocint/logs -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -printf "%T+ %p; " -exec awk '/Time:/ {sum += $4} END {print sum/60000 " min"}' '{}' \; | sort
+find /your_working_directory/geocint/logs -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -printf "%T+ %p; " -exec awk '/Time:/ {sum += $4} END {print sum/60000 " min"}' '{}' \; | sort
 ```
 
 `-mtime -50` - collects every row from 50 days ago till now
