@@ -9,18 +9,16 @@ PGUSER=gis
 # set to true to check installation scripts before each run
 CHECK_INSTALLATIONS_BEFORE_RUN=true
 
-KEEP_FOLDERS_REGEX='.*/\|.*/data[^.]*\|.*/db[^.]*\|.*/deploy[^.]*\|.*/logs[^.]*\|.*/reports[^.]*\|.*/installation[^.]*'
+KEEP_FOLDERS_REGEX='.*/\|.*/data[^.]*\|.*/db[^.]*\|.*/deploy[^.]*\|.*/logs[^.]*\|.*/report[^.]*\|.*/installation[^.]*\|.*/completeness_report[^.]*'
 KEEP_FILES_REGEX=".*/make_profile\.db[^.]*"
 
 # variable to store additional paths, that should be added to the PATH variable
 # replase "gis" with your user name
 PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
-# directory for pipeline execution 
-GENERAL_FOLDER=geocint
 # directories that should be added to env
 OPTIONAL_DIRECTORIES=''
-# name of your private repository
-PRIVATE_REPO_NAME=geocint-private
+# name of folder with your custom part of pipeline
+CUSTOM_PART_FOLDER_NAME=geocint-private
 
 # updates block
 # set to true to pull the geocint-runner repo before each run

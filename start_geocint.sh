@@ -4,7 +4,7 @@
 # Set variables from the configuration file
 echo ${GEOCINT_WORK_DIRECTORY}
 . ${GEOCINT_WORK_DIRECTORY}/config.inc.sh
-export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES PRIVATE_REPO_NAME
+export PATH_ARRAY GENERAL_FOLDER OPTIONAL_DIRECTORIES CUSTOM_PART_FOLDER_NAME
 export UPDATE_RUNNER UPDATE_OSM_LOGIC UPDATE_PRIVATE RUN_TARGETS
 export SLACK_CHANNEL SLACK_BOT_NAME SLACK_BOT_EMOJI SLACK_KEY USER_NAME
 export CHECK_INSTALLATIONS_BEFORE_RUN KEEP_FOLDERS_REGEX KEEP_FILES_REGEX
@@ -18,7 +18,7 @@ cleanup() {
 if [ "$CHECK_INSTALLATIONS_BEFORE_RUN" = "true" ]; then
   bash ${GEOCINT_WORK_DIRECTORY}/geocint-runner/runner-install.sh || echo 'runner-install.sh returned an error, check logs for more infornation' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
   bash ${GEOCINT_WORK_DIRECTORY}/geocint-openstreetmap/openstreetmap-install.sh || echo 'openstreetmap-install.sh returned an error, check logs for more infornation' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
-  bash ${GEOCINT_WORK_DIRECTORY}/$PRIVATE_REPO_NAME/install.sh || echo 'install.sh returned an error, check logs for more infornation' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+  bash ${GEOCINT_WORK_DIRECTORY}/$CUSTOM_PART_FOLDER_NAME/install.sh || echo 'install.sh returned an error, check logs for more infornation' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 fi
 
 # create a working directory if it does not exist
@@ -62,7 +62,7 @@ fi
 
 # Update private repo if updating is true in config
 if [ "$UPDATE_PRIVATE" = "true" ]; then
-  cd ${GEOCINT_WORK_DIRECTORY}/$PRIVATE_REPO_NAME; git pull --rebase --autostash || { git stash && git pull && echo 'git rebase autostash $PRIVATE_REPO_NAME failed, stash and pull executed' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI; }
+  cd ${GEOCINT_WORK_DIRECTORY}/$CUSTOM_PART_FOLDER_NAME; git pull --rebase --autostash || { git stash && git pull && echo 'git rebase autostash $CUSTOM_PART_FOLDER_NAME failed, stash and pull executed' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI; }
 fi
 
 # Remove all files and folders except data, db, deploy and logs from the general folder 
@@ -83,7 +83,7 @@ fi
 cd ${GEOCINT_WORK_DIRECTORY}
 # Merge geocint-runner, geocint-openstreetmap and your private repo to one folder and check duplicated files
 # This script uses ALLOW_DUPLICATE_FILES variable from confic.inc.sh (by default it ignores README.md and LICENSE files in a root of every repo)
-copy_message="$(python geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $PRIVATE_REPO_NAME)"
+copy_message="$(python geocint-runner/scripts/merge_repos_and_check_duplicates.py geocint-runner geocint-openstreetmap $CUSTOM_PART_FOLDER_NAME)"
 
 # This script sends 2 different messages. 
 # check if the message starts with "Copy..". Then copying was successful. 
@@ -108,10 +108,10 @@ profile_make clean
 # the script goes into each folder and writes to the variable the name of the branch to which the repository is currently switched.
 branch_runner="$(cd ${GEOCINT_WORK_DIRECTORY}/geocint-runner; git branch --show-current)"
 branch_osm="$(cd ${GEOCINT_WORK_DIRECTORY}/geocint-openstreetmap; git branch --show-current)"
-branch_private="$(cd ${GEOCINT_WORK_DIRECTORY}/$PRIVATE_REPO_NAME; git branch --show-current)"
+branch_private="$(cd ${GEOCINT_WORK_DIRECTORY}/$CUSTOM_PART_FOLDER_NAME; git branch --show-current)"
 
 # send a message to the slack channel with run information
-echo "Geocint server: current geocint-runner branch is $branch_runner, geocint-openstreetmap branch is $branch_osm, $PRIVATE_REPO_NAME branch is $branch_private. Running $RUN_TARGETS targets." | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
+echo "Geocint server: current geocint-runner branch is $branch_runner, geocint-openstreetmap branch is $branch_osm, $CUSTOM_PART_FOLDER_NAME branch is $branch_private. Running $RUN_TARGETS targets." | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
 # run the pipeline
 profile_make -j -k $RUN_TARGETS
 
