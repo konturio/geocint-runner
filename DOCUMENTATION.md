@@ -68,20 +68,50 @@ Also when running the pipeline Makefile will create additional files:
 
 ## Geocint open-source installation and first run guide
 
-### Installation
+### How to create your custom third part of pipeline
 Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
-Your repository should contain the following required files:
-- install.sh (use [runner-install.sh](runner-install.sh) as an example, store installation of your additional dependencies)
-- Makefile (use [your_make.sample](your_make.sample) as an example; file to store your own additional targets chains. 
+Since geocint consists of 3 main parts (geocint-runner, geocint-openstreetmap and your custom part) to launch the pipeline
+you will need to pull from the github to your working folder the geocinth-runner and geocinth-openstreetmap repositories.
+You can do this with the following commands:
+```shell
+	cd /your_working_directory/
+	git pull https://github.com/konturio/geocint-runner.git
+	git pull https://github.com/konturio/geocint-openstreetmap.git
+```
 
-Your Makefile should start with export block:
+Next, you need to create a folder where you will store the custom part of the pipeline (for exmple `geocint-custom`) and initialize the repository.
+The custom part is a git repository (folder) with a set of files necessary to execute the pipeline.
+```shell
+	mkdir /your_working_directory/geocint-custom
+	cd /your_working_directory/geocint-custom && git init
+```
+
+The minimum set of files consists of:
+- install.sh (use [runner-install.sh](runner-install.sh) from geocint-runner repository as an example, 
+this bash script will store installation of your additional dependencies (for example geopandas, if you need it for your pipeline))
+
+create an empty file in your folder and save this code as a `install.sh` file:
+```
+#!/bin/bash
+
+# Add here your custom intallation instructions
+# use runner-install.sh from geocint-runner repository as an example
+# Please, use sudo to run commands and -y for apt, for example
+# sudo apt install -y osmium-tool
+
+# remove this row afret adding any row with installation
+exit 0
+```
+
+- Makefile (use [your_make.sample](your_make.sample) from geocint-runner repository as an example how to create new pipeline.
+
+create an empty file in your folder and save this code as a `Makefile` file:
 ```
 ## -------------- EXPORT BLOCK ------------------------
 
 # configuration file
 file := ${GEOCINT_WORK_DIRECTORY}/config.inc.sh
 # Add an export here for each variable from the configuration file that you are going to use in the targets.
-export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${file} | cut -d "=" -f 2)
@@ -97,7 +127,7 @@ include runner_make osm_make
 # replace your_final_target placeholder with the names of final target, that you will use to run pipeline
 # you can also add here the names of targets that should not be rebuilt automatically, just when conditions are met or at your request
 # to do it just add these names after the colon separated by a space
-all: your_final_target ## [FINAL] Meta-target on top of all other targets, or targets on parking.
+all: data/out/hello_world.txt ## [FINAL] Meta-target on top of all other targets, or targets on parking.
 
 # by default the clean target is set to serve an update of the OpenStreetMap planet dump during every run
 clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean non-repeating targets.
@@ -105,7 +135,13 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 	rm -rf data/planet-is-broken
 	profile_make_clean data/planet-latest-updated.osm.pbf
 
+data/out/hello_world.txt: data/out ## Create a simple txt file and say Hello World!
+	# this target will create /your_working_directory/geocint/data/out/hello_world.txt file with Hello World! line inside
+	echo "Hello World!" >> $@
+
 ```
+
+### Installation
 
 1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
 2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to working directory.
