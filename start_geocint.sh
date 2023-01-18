@@ -115,7 +115,7 @@ echo "Geocint server: current geocint-runner branch is $branch_runner, geocint-o
 # run the pipeline
 profile_make -j -k $RUN_TARGETS
 
-results_check="$(make -k -q -n --debug=b $RUN_TARGETS 2>&1 | grep -v Trying | grep -v Rejecting | grep -v implicit | grep -v 'Looking for' | grep -v 'Successfully remade' | tail -n+10
+results_check="$(make -k -q -n --debug=b $RUN_TARGETS 2>&1 | grep -v Trying | grep -v Rejecting | grep -v implicit | grep -v 'Looking for' | grep -v 'Successfully remade' | tail -n+10)"
 
 if [ "$results_check" = "" ]; then
   echo 'No issues were found during final testing' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI
