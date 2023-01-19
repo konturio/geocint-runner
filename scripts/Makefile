@@ -4,6 +4,7 @@
 # Add here export for every varible from configuration file that you are going to use in targets
 export PGDATABASE = $(shell sed -n -e '/^PGDATABASE/p' ${configuration_file} | cut -d "=" -f 2)
 export PGUSER = $(shell sed -n -e '/^PGUSER/p' ${configuration_file} | cut -d "=" -f 2)
+export INSTALL_POSTGRESQL_EXTENSIONS = $(shell sed -n -e '/^INSTALL_POSTGRESQL_EXTENSIONS/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${configuration_file} | cut -d "=" -f 2)
@@ -12,6 +13,7 @@ export SLACK_BOT_KEY = $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${configuration_fil
 export GEOCINT_WORK_DIRECTORY = $(shell sed -n -e '/^GEOCINT_WORK_DIRECTORY/p' ${configuration_file} | cut -d "=" -f 2)
 export CUSTOM_PART_FOLDER_NAME = $(shell sed -n -e '/^CUSTOM_PART_FOLDER_NAME/p' ${configuration_file} | cut -d "=" -f 2)
 
+PG_EXTENSIONS_LIST = $(shell echo "${INSTALL_POSTGRESQL_EXTENSIONS}" | tr "," "\n")
 
 # -------------------- PREPARATIONS BLOCK -----------------------------------
 
@@ -76,12 +78,11 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database: ${GEOCINT_WORK_D
 	touch $@
 	
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_extensions: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database ## create postgresql extensions
-	psql -c "CREATE EXTENSION postgis;"
-	psql -c "CREATE EXTENSION postgis_raster;"
-	psql -c "CREATE EXTENSION postgis_sfcgal;"
-	psql -c "CREATE EXTENSION postgis_topology;"
-	psql -c "CREATE EXTENSION h3;"
-	psql -c "CREATE EXTENSION h3_postgis;"
+	echo "Create PostgreSQL extensions:"
+	echo ${PG_EXTENSIONS_LIST}	
+	for i in $(PG_EXTENSIONS_LIST); do \
+		psql -c "CREATE EXTENSION IF NOT EXISTS $$i ;"; \
+	done
 	touch $@
 
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_extensions ## send message that database initialisation step finished successfully
