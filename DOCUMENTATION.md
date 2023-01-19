@@ -127,7 +127,7 @@ Open ~/config.inc.sh and set the necessary values for variables. See comments at
 - ~/geocint-runner/runner-install.sh (necessary dependencies to run a runner part)
 - ~/geocint-openstreetmap/openstreetmap-install.sh (necessary dependencies to run a runner part)
 - ~/[geocint-private]/install.sh (Do not forget to install any of your custom dependancies, if any. Change [geocint-private] to the name of your private repository. )
-- ~/geocint-runner/scripts/set_modes.sh (create /public_html and /domlogs folders and set access modes)
+- ~/geocint-runner/scripts/set_modes.sh (create /public_html and /domlogs folders and set access modes. This script also installs nginx and exposes necessary files to the web)
 
 Please also note, that installers are run automatically, when the pipeline is started via start_geocint.sh
 
