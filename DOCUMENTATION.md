@@ -73,7 +73,7 @@ Also when running the pipeline Makefile will create additional files:
 Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
 
 Since geocint consists of 3 main parts (geocint-runner, geocint-openstreetmap and your custom part) to launch the pipeline
-you will need to pull from the github to your working folder the geocinth-runner and geocinth-openstreetmap repositories.
+you will need to pull from the github to your working folder the geocint-runner and geocinth-openstreetmap repositories.
 You can do this with the following commands:
 ```shell
 	cd /your_working_directory/
@@ -81,7 +81,7 @@ You can do this with the following commands:
 	git pull https://github.com/konturio/geocint-openstreetmap.git
 ```
 
-Next, you need to create a folder where you will store the custom part of the pipeline (for exmple `geocint-custom`) and initialize the repository.
+Next, you need to create a folder where you will store the custom part of the pipeline (for example `geocint-custom`) and initialize the repository.
 The custom part is a git repository (folder) with a set of files necessary to execute the pipeline.
 ```shell
 	mkdir /your_working_directory/geocint-custom
