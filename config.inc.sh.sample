@@ -16,7 +16,7 @@ KEEP_FILES_REGEX=".*/make_profile\.db[^.]*"
 
 # variable to store additional paths, that should be added to the PATH variable
 # replase "gis" with your user name
-PATH_ARRAY='/home/gis/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:'
+PATH_ARRAY='$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin::/usr/local/pgsql/bin'
 # directories that should be added to env
 OPTIONAL_DIRECTORIES=''
 # name of folder with your custom part of pipeline
