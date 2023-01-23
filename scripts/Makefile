@@ -60,6 +60,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTO
 	sudo chown ${USER}:${USER} ${GEOCINT_WORK_DIRECTORY}/public_html
 	sudo chmod 0750 ${GEOCINT_WORK_DIRECTORY}/public_html
 	sudo echo 'export PATH=$$PATH:/usr/local/pgsql/bin' >> ${HOME}/.bashrc
+	sudo echo 'GEOCINT_WORK_DIRECTORY=${GEOCINT_WORK_DIRECTORY}' >> /etc/environment
 	touch $@
 
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes ## send message that installation step finished successfully
