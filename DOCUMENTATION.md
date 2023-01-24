@@ -2,6 +2,7 @@
 
 * Geocint folder structure
 * Geocint open-source installation and first run guide
+	* How to create your custom part of pipeline
     * Installation
     * First run
 * How geocint pipeline works
@@ -18,19 +19,14 @@ Geocint consists of 3 different parts:
 - [geocint-runner](https://github.com/konturio/geocint-runner) - a core part of the pipeline, includes utilities and initial Makefile
 - [geocint-openstreetmap](https://github.com/konturio/geocint-openstreetmap) - a chain of targets for downloading, updating and uploading
 to database OpenStreetMap planet dump
-- [geocint-private] any repository that contains your additional functionality
+- [geocint-custom] any repository that contains your additional functionality
 
-During the installation process, you should clone all these repositories to ~/.
+During the installation of the geocint pipeline the next folder will be created in your working directory:
 
-During the installation of the geocint pipeline the next folders will be created in your home directory (~/):
+- [public_html] - any public html that you want to share (use standard nginx logs to get information)
 
-- [public_html] - any public html that you want to share
-- [domlogs] - access and errors logs for files from the public_html folder
-
-Then start_geocint.sh will copy files from all these repositories to ~/geocint folder. Geocint folder will be the working folder for the geocint pipeline
-(you can set any other name for this folder with the GENERAL_FOLDER variable in confic.inc.sh file)
-
-In general case ~/geocint folder includes the next files and folders :
+In general case geocint folder includes the next files and folders :
+- [scripts/Makefile](scripts/Makefile) - makefile for geocint installation
 - [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
   posting info messages
 - [runner-install.sh](runner-install.sh) - script, that runs installation of required packages of the geocint-runner part
@@ -68,20 +64,51 @@ Also when running the pipeline Makefile will create additional files:
 
 ## Geocint open-source installation and first run guide
 
-### Installation
+### How to create your custom part of pipeline
 Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
-Your repository should contain the following required files:
-- install.sh (use [runner-install.sh](runner-install.sh) as an example, store installation of your additional dependencies)
-- Makefile (use [private_make.sample](your_make.sample) as an example; file to store your own additional targets chains. 
 
-Your Makefile should start with export block:
+Since geocint consists of 3 main parts (geocint-runner, geocint-openstreetmap and your custom part) to launch the pipeline
+you will need to pull from the github to your working folder the geocint-runner and geocinth-openstreetmap repositories.
+You can do this with the following commands:
+```shell
+	cd /your_working_directory/
+	git clone https://github.com/konturio/geocint-runner.git
+	git clone https://github.com/konturio/geocint-openstreetmap.git
+```
+
+Next, you need to create a folder where you will store the custom part of the pipeline (for example `geocint-custom`) and initialize the repository.
+The custom part is a git repository (folder) with a set of files necessary to execute the pipeline.
+```shell
+	mkdir /your_working_directory/geocint-custom
+	cd /your_working_directory/geocint-custom && git init
+```
+
+The minimum set of files consists of:
+- install.sh (use [runner-install.sh](runner-install.sh) from geocint-runner repository as an example, 
+this bash script will store installation of your additional dependencies (for example geopandas, if you need it for your pipeline))
+
+create an empty file in your folder and save this code as a `install.sh` file:
+```
+#!/bin/bash
+
+# Add here your custom intallation instructions
+# use runner-install.sh from geocint-runner repository as an example
+# Please, use sudo to run commands and -y for apt, for example
+# sudo apt install -y osmium-tool
+
+# remove this row afret adding any row with installation
+exit 0
+```
+
+- Makefile (use [your_make.sample](your_make.sample) from geocint-runner repository as an example how to create new pipeline.
+
+create an empty file in your folder and save this code as a `Makefile` file:
 ```
 ## -------------- EXPORT BLOCK ------------------------
 
 # configuration file
-file := ~/config.inc.sh
+file := ${GEOCINT_WORK_DIRECTORY}/config.inc.sh
 # Add an export here for each variable from the configuration file that you are going to use in the targets.
-export USER_NAME = $(shell sed -n -e '/^USER_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${file} | cut -d "=" -f 2)
 export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${file} | cut -d "=" -f 2)
@@ -97,7 +124,7 @@ include runner_make osm_make
 # replace your_final_target placeholder with the names of final target, that you will use to run pipeline
 # you can also add here the names of targets that should not be rebuilt automatically, just when conditions are met or at your request
 # to do it just add these names after the colon separated by a space
-all: your_final_target ## [FINAL] Meta-target on top of all other targets, or targets on parking.
+all: data/out/hello_world.txt ## [FINAL] Meta-target on top of all other targets, or targets on parking.
 
 # by default the clean target is set to serve an update of the OpenStreetMap planet dump during every run
 clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean non-repeating targets.
@@ -105,10 +132,16 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 	rm -rf data/planet-is-broken
 	profile_make_clean data/planet-latest-updated.osm.pbf
 
+data/out/hello_world.txt: data/out ## Create a simple txt file and say Hello World!
+	# this target will create /your_working_directory/geocint/data/out/hello_world.txt file with Hello World! line inside
+	echo "Hello World!" >> $@
+
 ```
 
-1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database. Path ~/ is equivalent to /home/your_user/. This folder is a working directory for the geocint pipeline.
-2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your repo) to ~/
+### Installation
+
+1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
+2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your custom repo) to working directory.
 3. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
 
 * Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
@@ -116,42 +149,23 @@ clean: ## [FINAL] Cleans the worktree for the next nightly run. Does not clean n
 * Add it to your [channel](https://slack.com/help/articles/202035138-Add-apps-to-your-Slack-workspace);
 * [Get the Bot User OAuth Token](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md#4-copy-oauth-access-token--use-in-azure-pipelines) n e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the SLACK_KEY variable in the file config.inc.sh. The angle brackets around your_key are in need to be removed.
 
-4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to ~/:
+4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to working directory and name config.inc.sh.
+
+Then open config.inc.sh and set the necessary values for variables. See comments at this file for details.
+
+5. Run installation:
 ```shell
-cp ~/geocint-runner/config.inc.sh.sample ~/config.inc.sh
+	# install cmake if not exists
+	sudo apt install -y cmake
+	# move to the folder with installation Makefile
+	cd /your/working/directory/geocint-runner/scripts/
+	# run installation (you should set path to config.inc.sh file)
+	make install configuration_file=/your/working/directory/config.inc.sh
+	# reload $HOME/.bashrc file
+	source ${HOME}/.bashrc
 ```
-Open ~/config.inc.sh and set the necessary values for variables. See comments at this file for details.
 
-5. Run installers:
-
-- ~/geocint-runner/runner-install.sh (necessary dependencies to run a runner part)
-- ~/geocint-openstreetmap/openstreetmap-install.sh (necessary dependencies to run a runner part)
-- ~/[geocint-private]/install.sh (Do not forget to install any of your custom dependancies, if any. Change [geocint-private] to the name of your private repository. )
-- ~/geocint-runner/scripts/set_modes.sh (create /public_html and /domlogs folders and set access modes)
-
-Please also note, that installers are run automatically, when the pipeline is started via start_geocint.sh
-
-6. Create PostgreSQL role and create PostgreSQL extensions (replace "gis" with your username if you have different). Follow the next steps below :
-```shell
-	# open psql console by admin (user postgres)
-	sudo -u postgres psql
-	# create role and database
-	create role gis login;
-	create database gis owner gis;
-	# connect to database
-	\c gis
-	# create extensions
-	create extension postgis;
-	create extension postgis_raster;
-	create extension postgis_sfcgal;
-	create extension postgis_topology;
-	create extension h3;
-	create extension h3_postgis;
-	# you can create any additional extension, that you need
-	# quit psql console
-	\q
-```
-7. Set the crontab to autostart the pipeline. 
+6. Set the crontab to autostart the pipeline. 
 
 To set up your crontab to start the pipeline automatically, you need to:
 * open crontab `crontab -e`. If you are trying to use crontab for the first time, please read this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
@@ -180,9 +194,9 @@ bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_dir
 
 ### How start_geocint.sh works
 
-After start_geocint.sh is run, it imports the variables from the configuration file ~/config.inc.sh. 
-It will then check the update flags in ~/config.inc.sh and git pull the repositories that have the flag set to “true”. 
-Next, it will merge geocint-runner, geocint-openstreetmap and your personal repository into one folder - you can set the name for this folder in ~/config.inc.sh file with $GENERAL_FOLDER variable.
+After start_geocint.sh is run, it imports the variables from the configuration file /your_working_directory//config.inc.sh. 
+It will then check the update flags in /your_working_directory/config.inc.sh and git pull the repositories that have the flag set to “true”. 
+Next, it will merge geocint-runner, geocint-openstreetmap and your custom repository into one folder /your_working_directory/geocint.
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets
@@ -243,12 +257,12 @@ are added to the geocint_users group role. You need to add the following line to
 
 ### How to analyse build time for targets
 
-Logs for every build are stored in `/home/gis/geocint/logs`
+Logs for every build are stored in `/your_working_directory/geocint/logs`
 
 This command can show lastN {*Total times in ms*} for some {*tablename*} ordered by date
 
 ```bash
-find /home/gis/geocint/logs -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -printf "%T+ %p; " -exec awk '/Time:/ {sum += $4} END {print sum/60000 " min"}' '{}' \; | sort
+find /your_working_directory/geocint/logs -type f -regex ".*/db/table/osm_admin_boundaries/log.txt" -mtime -50 -printf "%T+ %p; " -exec awk '/Time:/ {sum += $4} END {print sum/60000 " min"}' '{}' \; | sort
 ```
 
 `-mtime -50` - collects every row from 50 days ago till now
