@@ -21,16 +21,11 @@ Geocint consists of 3 different parts:
 to database OpenStreetMap planet dump
 - [geocint-custom] any repository that contains your additional functionality
 
-During the installation process, you should clone all these repositories to working directory.
-
 During the installation of the geocint pipeline the next folder will be created in your working directory:
 
-- [public_html] - any public html that you want to share
+- [public_html] - any public html that you want to share (use standard nginx logs to get information)
 
-Then start_geocint.sh will copy files from all these repositories to ~/geocint folder. Geocint folder will be the working folder for the geocint pipeline
-(you can set any other name for this folder with the GENERAL_FOLDER variable in confic.inc.sh file)
-
-In general case ~/geocint folder includes the next files and folders :
+In general case geocint folder includes the next files and folders :
 - [scripts/Makefile](scripts/Makefile) - makefile for geocint installation
 - [start_geocint.sh](start_geocint.sh) - script, that runs the pipeline: checking required packages, cleaning targets and
   posting info messages
@@ -166,7 +161,7 @@ Then open config.inc.sh and set the necessary values for variables. See comments
 	cd /your/working/directory/geocint-runner/scripts/
 	# run installation (you should set path to config.inc.sh file)
 	make install configuration_file=/your/working/directory/config.inc.sh
-	# reload ~/.bashrc file
+	# reload $HOME/.bashrc file
 	source ${HOME}/.bashrc
 ```
 
