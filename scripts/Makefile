@@ -90,8 +90,38 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCIN
 	echo "Database initialisation step finished successfully"
 	touch $@
 
+# ------------------------ Web-dashboard configuration block ----------------------------
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes ## install nginx and expose necessary files to web
+	#1. turn off apache
+	sudo systemctl stop apache2
+	sudo systemctl disable apache2
+
+	#2. install nginx
+	sudo apt update
+	sudo apt install nginx
+	sudo ufw allow "Nginx Full"
+
+	#3. turn nginx on
+	sudo systemctl start nginx
+	sudo systemctl restart nginx
+
+	#4. make nginx configuration
+	# ???
+
+	#4. init front-end of make profiler
+	profile_make_init_viewer -o=${GEOCINT_WORK_DIRECTORY}/public_html
+
+	#5. create symbolic links for necessary files which should be exposed to web.
+	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/report.json  ${GEOCINT_WORK_DIRECTORY}/public_html/report.json
+	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/make.svg  ${GEOCINT_WORK_DIRECTORY}/public_html/make.svg
+	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/logs  ${GEOCINT_WORK_DIRECTORY}/public_html/logs
+	touch $@
+
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation ## send message that database initialisation step finished successfully
+	echo "Web-dashboard installation step finished successfully"
+	touch $@
 
 # ------------------------ MANAGE BLOCK ---------------------------------------
 
-install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ## Target to run Geocint pipeline installation
+install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished ## Target to run Geocint pipeline installation
 	echo "Geocint pipeline successfully installed"
