@@ -11,7 +11,9 @@ INSTALL_POSTGRESQL_EXTENSIONS=postgis,postgis_raster,postgis_sfcgal,postgis_topo
 # set to true to check installation scripts before each run
 CHECK_INSTALLATIONS_BEFORE_RUN=true
 
+# Regular expression listing folders in geocint folder that should not be deleted during startup
 KEEP_FOLDERS_REGEX='.*/\|.*/data[^.]*\|.*/db[^.]*\|.*/deploy[^.]*\|.*/logs[^.]*\|.*/report[^.]*\|.*/installation[^.]*\|.*/completeness_report[^.]*'
+# Regular expression listing files in geocint folder that should not be deleted during startup
 KEEP_FILES_REGEX=".*/make_profile\.db[^.]*"
 
 # variable to store additional paths, that should be added to the PATH variable
