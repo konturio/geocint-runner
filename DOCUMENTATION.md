@@ -72,8 +72,8 @@ you will need to pull from the github to your working folder the geocint-runner 
 You can do this with the following commands:
 ```shell
 	cd /your_working_directory/
-	git pull https://github.com/konturio/geocint-runner.git
-	git pull https://github.com/konturio/geocint-openstreetmap.git
+	git clone https://github.com/konturio/geocint-runner.git
+	git clone https://github.com/konturio/geocint-openstreetmap.git
 ```
 
 Next, you need to create a folder where you will store the custom part of the pipeline (for example `geocint-custom`) and initialize the repository.
