@@ -23,7 +23,7 @@ to database OpenStreetMap planet dump
 
 During the installation of the geocint pipeline the next folder will be created in your working directory:
 
-- [public_html] - any public html that you want to share (use standard nginx logs to get information)
+- [public_html] - any public html that you want to share. Usually geocint web-dashboard and make logs should be exposed to web. This is done automatically during installation. To get access information please use standard nginx logs.
 
 In general case geocint folder includes the next files and folders :
 - [scripts/Makefile](scripts/Makefile) - makefile for geocint installation
