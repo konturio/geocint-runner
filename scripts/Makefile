@@ -71,11 +71,19 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished: ${GE
 # ------------------------ DB configuration block ----------------------------
 
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_user: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished ## create postgresql user
-	sudo -u postgres psql -c "CREATE ROLE ${PGUSER} WITH SUPERUSER LOGIN ENCRYPTED PASSWORD '${PGUSER}pass';"
+	rm -f USER_COUNT
+	sudo -u postgres psql -q -X -t -c "select count(*) from pg_roles WHERE rolname = '${PGUSER}'" | xargs echo > USER_COUNT
+	if [ $$(cat USER_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE ROLE ${PGUSER} WITH SUPERUSER LOGIN ENCRYPTED PASSWORD '${PGUSER}pass';"; fi
+	if [ 0 -lt $$(cat USER_COUNT) ]; then echo "role ${PGUSER} alredy exists. Skip creation."; fi
+	rm -f USER_COUNT
 	touch $@
 	
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_user ## create postgresql db
-	sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGUSER};"
+	rm -f DB_COUNT
+	sudo -u postgres psql -q -X -t -c "select count(*) FROM pg_database WHERE datname = '${PGDATABASE}'" | xargs echo > DB_COUNT
+	if [ $$(cat DB_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGDATABASE};"; fi
+	if [ 0 -lt $$(cat DB_COUNT) ]; then echo "database ${PGDATABASE} alredy exists. Skip creation."; fi
+	rm -f DB_COUNT
 	touch $@
 	
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_extensions: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database ## create postgresql extensions
