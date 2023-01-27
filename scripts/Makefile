@@ -4,6 +4,7 @@
 # Add here export for every varible from configuration file that you are going to use in targets
 export PGDATABASE = $(shell sed -n -e '/^PGDATABASE/p' ${configuration_file} | cut -d "=" -f 2)
 export PGUSER = $(shell sed -n -e '/^PGUSER/p' ${configuration_file} | cut -d "=" -f 2)
+export PGPASSWORD = $(shell sed -n -e '/^PGPASSWORD/p' ${configuration_file} | cut -d "=" -f 2)
 export INSTALL_POSTGRESQL_EXTENSIONS = $(shell sed -n -e '/^INSTALL_POSTGRESQL_EXTENSIONS/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${configuration_file} | cut -d "=" -f 2)
@@ -73,16 +74,16 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished: ${GE
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_user: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished ## create postgresql user
 	rm -f USER_COUNT
 	sudo -u postgres psql -q -X -t -c "select count(*) from pg_roles WHERE rolname = '${PGUSER}'" | xargs echo > USER_COUNT
-	if [ $$(cat USER_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE ROLE ${PGUSER} WITH SUPERUSER LOGIN ENCRYPTED PASSWORD '${PGUSER}pass';"; fi
-	if [ 0 -lt $$(cat USER_COUNT) ]; then echo "role ${PGUSER} alredy exists. Skip creation."; fi
+	if [ $$(cat USER_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE ROLE ${PGUSER} WITH SUPERUSER LOGIN ENCRYPTED PASSWORD '${PGPASSWORD}';"; fi
+	if [ 0 -lt $$(cat USER_COUNT) ]; then echo "role ${PGUSER} already exists. Skip creation."; fi
 	rm -f USER_COUNT
 	touch $@
 	
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_user ## create postgresql db
 	rm -f DB_COUNT
 	sudo -u postgres psql -q -X -t -c "select count(*) FROM pg_database WHERE datname = '${PGDATABASE}'" | xargs echo > DB_COUNT
-	if [ $$(cat DB_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGDATABASE};"; fi
-	if [ 0 -lt $$(cat DB_COUNT) ]; then echo "database ${PGDATABASE} alredy exists. Skip creation."; fi
+	if [ $$(cat DB_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGUSER};"; fi
+	if [ 0 -lt $$(cat DB_COUNT) ]; then echo "database ${PGDATABASE} already exists. Skip creation."; fi
 	rm -f DB_COUNT
 	touch $@
 	

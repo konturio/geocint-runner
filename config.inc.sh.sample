@@ -5,6 +5,8 @@ GEOCINT_WORK_DIRECTORY=/home/pipeline/worked_directory
 PGDATABASE=gis
 # set name of postgres user
 PGUSER=gis
+# set password for postgresql
+PGPASSWORD=gis
 # list of extensions that should be installed to PostgreSQL database
 INSTALL_POSTGRESQL_EXTENSIONS=postgis,postgis_raster,postgis_sfcgal,postgis_topology,h3,h3_postgis
 
