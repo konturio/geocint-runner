@@ -81,7 +81,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCIN
 	touch $@
 
 # ------------------------ WEB Dashboard installation block ----------------------------
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/nginx_installation: ## install and configure nginx
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/nginx_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/preparation_block_finished  ## install and configure nginx
 	sudo systemctl stop apache2
 	sudo systemctl disable apache2
 	sudo apt update
@@ -103,7 +103,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTO
 	touch $@
 
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes 
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer
 	profile_make_init_viewer -o=${GEOCINT_WORK_DIRECTORY}/public_html
 	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/report.json  ${GEOCINT_WORK_DIRECTORY}/public_html/report.json
 	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/make.svg  ${GEOCINT_WORK_DIRECTORY}/public_html/make.svg
