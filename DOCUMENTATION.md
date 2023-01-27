@@ -272,11 +272,20 @@ find /your_working_directory/geocint/logs -type f -regex ".*/db/table/osm_admin_
 
 ## Make-profiler
 
-Make-profiler is used as a linter and preprocessor for Makefile that outputs a network diagram of what is getting built, when, and why. 
-The output chart (by default make.svg) allows seeing what went wrong and quickly getting to logs. https://github.com/konturio/make-profiler
-
-After the pipeline run, make_profiler will create a make.svg file and make_profile.db.
-Make-profile features:
+Make-profiler is used as a linter and preprocessor for Makefile that outputs a network diagram and an html report of what is getting built, when, and why. 
+The output chart (by default make.svg) & html report allows seeing what went wrong and quickly getting to logs. https://github.com/konturio/make-profiler  
+After the pipeline run, make_profiler will create make.svg, make_profile.db & a json file to be used on report page.  
+Both svg file and report can be reached on web from http://your_ip_or_domain/make.svg & http://your_ip_or_domain/  
+While report json generation make_profile.db, logs and relevant folders are checked and result json file is created including last pipeline status and information about every target. This json is used on report page.  
+  
+Make-profile report features:
+- Total number of targets finished, in progress and failed is reported.    
+- Targets finished, in progress and failed can be seen on white, yellow and red colors.   
+- Tasks can be filtered and only desired ones can be seen.  
+- Status duration, last completed date, status date & logs about task can be reached for every task.  
+- Report can be sorted with any of task information.  
+  
+Make-profile svg features:
 - SVG build overview;
 - Critical Path is highlighted;
 - Inline pictures-targets into build overview;
