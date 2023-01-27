@@ -92,7 +92,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/nginx_installation: ## install an
 	sudo systemctl restart nginx
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}  ## create public_html folder and set access
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/preparation_block_finished  ## create public_html folder and set access
 	sudo usermod -aG adm ${USER}
 	sudo usermod -aG ${USER} www-data
 	sudo mkdir -p ${GEOCINT_WORK_DIRECTORY}/public_html
