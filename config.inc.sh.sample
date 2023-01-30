@@ -1,6 +1,6 @@
 # general variables
 # set path to pipeline working directory
-GEOCINT_WORK_DIRECTORY=/home/pipeline/worked_directory
+GEOCINT_WORK_DIRECTORY=/home/gis
 # set name of postgres database
 PGDATABASE=gis
 # set name of postgres user
@@ -11,7 +11,7 @@ PGPASSWORD=gis
 INSTALL_POSTGRESQL_EXTENSIONS=postgis,postgis_raster,postgis_sfcgal,postgis_topology,h3,h3_postgis
 
 # set to true to check installation scripts before each run
-CHECK_INSTALLATIONS_BEFORE_RUN=true
+CHECK_INSTALLATIONS_BEFORE_RUN=false
 
 # Regular expression listing folders in geocint folder that should not be deleted during startup
 KEEP_FOLDERS_REGEX='.*/\|.*/data[^.]*\|.*/db[^.]*\|.*/deploy[^.]*\|.*/logs[^.]*\|.*/report[^.]*\|.*/installation[^.]*\|.*/completeness_report[^.]*'
@@ -31,7 +31,7 @@ CUSTOM_PART_FOLDER_NAME=geocint-private
 UPDATE_RUNNER=false
 # set to true to pull the geocint-openstreetmap repo before each run
 UPDATE_OSM_LOGIC=false
-# set to true to pull your repo before each run
+# set to true to pull your custom repo before each run
 UPDATE_PRIVATE=true
 
 # targets block

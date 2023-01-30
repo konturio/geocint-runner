@@ -9,7 +9,7 @@ export INSTALL_POSTGRESQL_EXTENSIONS = $(shell sed -n -e '/^INSTALL_POSTGRESQL_E
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${configuration_file} | cut -d "=" -f 2)
-export SLACK_BOT_KEY = $(shell sed -n -e '/^SLACK_BOT_KEY/p' ${configuration_file} | cut -d "=" -f 2)
+export SLACK_KEY = $(shell sed -n -e '/^SLACK_KEY/p' ${configuration_file} | cut -d "=" -f 2)
 
 export GEOCINT_WORK_DIRECTORY = $(shell sed -n -e '/^GEOCINT_WORK_DIRECTORY/p' ${configuration_file} | cut -d "=" -f 2)
 export CUSTOM_PART_FOLDER_NAME = $(shell sed -n -e '/^CUSTOM_PART_FOLDER_NAME/p' ${configuration_file} | cut -d "=" -f 2)

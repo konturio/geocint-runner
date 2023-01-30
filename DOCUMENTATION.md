@@ -163,6 +163,9 @@ Then open config.inc.sh and set the necessary values for variables. See comments
 	make install configuration_file=/your/working/directory/config.inc.sh
 	# reload $HOME/.bashrc file
 	source ${HOME}/.bashrc
+
+	# restart your server
+	sudo reboot
 ```
 
 6. Set the crontab to autostart the pipeline. 
