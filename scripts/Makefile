@@ -99,12 +99,12 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation: ${GEO
 	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/logs  ${GEOCINT_WORK_DIRECTORY}/public_html/logs
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation  ## send message that web dashboard initialisation step finished successfully
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation  ## send message that web dashboard initialisation step finished successfully
 	echo "web dashboard installation step finished successfully"
 	touch $@
 
 
 # ------------------------ MANAGE BLOCK ---------------------------------------
 
-install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ## Target to run Geocint pipeline installation
+install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished ## Target to run Geocint pipeline installation
 	echo "Geocint pipeline successfully installed"
