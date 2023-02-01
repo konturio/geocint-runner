@@ -81,16 +81,6 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCIN
 	touch $@
 
 # ------------------------ WEB Dashboard installation block ----------------------------
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/nginx_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/preparation_block_finished  ## install and configure nginx
-	sudo systemctl stop apache2
-	sudo systemctl disable apache2
-	sudo apt update
-	sudo apt install nginx
-	sudo ufw allow "Nginx Full"
-	sudo nginx -t
-	sudo systemctl start nginx
-	sudo systemctl restart nginx
-	touch $@
 
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/preparation_block_finished  ## create public_html folder and set access
 	sudo usermod -aG adm ${USER}
@@ -98,7 +88,6 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTO
 	sudo mkdir -p ${GEOCINT_WORK_DIRECTORY}/public_html
 	sudo chown ${USER}:${USER} ${GEOCINT_WORK_DIRECTORY}/public_html
 	sudo chmod 0750 ${GEOCINT_WORK_DIRECTORY}/public_html
-	sudo echo 'export PATH=$$PATH:/usr/local/pgsql/bin' >> ${HOME}/.bashrc
 	echo 'GEOCINT_WORK_DIRECTORY=${GEOCINT_WORK_DIRECTORY}' | sudo tee -a /etc/environment
 	touch $@
 
@@ -110,7 +99,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation: ${GEO
 	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/logs  ${GEOCINT_WORK_DIRECTORY}/public_html/logs
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/nginx_installation ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation  ## send message that web dashboard initialisation step finished successfully
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation  ## send message that web dashboard initialisation step finished successfully
 	echo "web dashboard installation step finished successfully"
 	touch $@
 
