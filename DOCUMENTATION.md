@@ -2,10 +2,10 @@
 
 * Geocint folder structure
 * Geocint open-source installation and first run guide
-	* Versions
-	* How to create your custom part of pipeline
+    * Versions
     * Installation
     * First run
+    * How to create your custom part of pipeline
 * How geocint pipeline works
     * How start_geocint.sh works
     * How to write targets
