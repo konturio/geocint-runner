@@ -76,6 +76,7 @@ else
   find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type f -not -regex $KEEP_FILES_REGEX -delete
 fi
 
+# create make.lock file
 touch ${GEOCINT_WORK_DIRECTORY}/geocint/make.lock
 # remove make.lock and exit after the pipeline finish
 trap 'cleanup' EXIT
