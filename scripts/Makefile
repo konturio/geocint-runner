@@ -54,17 +54,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/private_installer: ${GEOCINT_WORK
 	bash ${GEOCINT_WORK_DIRECTORY}/${CUSTOM_PART_FOLDER_NAME}/install.sh || echo 'install.sh returned an error, check logs for more infornation'
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/private_installer ## create public_html folder and set access
-	sudo usermod -aG adm ${USER}
-	sudo usermod -aG ${USER} www-data
-	sudo mkdir -p ${GEOCINT_WORK_DIRECTORY}/public_html
-	sudo chown ${USER}:${USER} ${GEOCINT_WORK_DIRECTORY}/public_html
-	sudo chmod 0750 ${GEOCINT_WORK_DIRECTORY}/public_html
-	sudo echo 'export PATH=$$PATH:/usr/local/pgsql/bin' >> ${HOME}/.bashrc
-	echo 'GEOCINT_WORK_DIRECTORY=${GEOCINT_WORK_DIRECTORY}' | sudo tee -a /etc/environment
-	touch $@
-
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes ## send message that installation step finished successfully
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/private_installer ## send message that installation step finished successfully
 	echo "Installation step finished successfully"
 	touch $@
 
@@ -99,8 +89,31 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCIN
 	echo "Database initialisation step finished successfully"
 	touch $@
 
+# ------------------------ WEB Dashboard installation block ----------------------------
+
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/preparation_block_finished  ## create public_html folder and set access
+	sudo usermod -aG adm ${USER}
+	sudo usermod -aG ${USER} www-data
+	sudo mkdir -p ${GEOCINT_WORK_DIRECTORY}/public_html
+	sudo chown ${USER}:${USER} ${GEOCINT_WORK_DIRECTORY}/public_html
+	sudo chmod 0750 ${GEOCINT_WORK_DIRECTORY}/public_html
+	echo 'GEOCINT_WORK_DIRECTORY=${GEOCINT_WORK_DIRECTORY}' | sudo tee -a /etc/environment
+	touch $@
+
+
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/set_modes ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer
+	profile_make_init_viewer -o=${GEOCINT_WORK_DIRECTORY}/public_html
+	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/report.json  ${GEOCINT_WORK_DIRECTORY}/public_html/report.json
+	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/make.svg  ${GEOCINT_WORK_DIRECTORY}/public_html/make.svg
+	ln -s ${GEOCINT_WORK_DIRECTORY}/geocint/logs  ${GEOCINT_WORK_DIRECTORY}/public_html/logs
+	touch $@
+
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_installation  ## send message that web dashboard initialisation step finished successfully
+	echo "web dashboard installation step finished successfully"
+	touch $@
+
 
 # ------------------------ MANAGE BLOCK ---------------------------------------
 
-install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ## Target to run Geocint pipeline installation
+install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished ## Target to run Geocint pipeline installation
 	echo "Geocint pipeline successfully installed"
