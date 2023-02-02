@@ -46,10 +46,6 @@ if [ -e make.lock ]; then
   exit 1
 fi
 
-# exit if make.lock file cannot be touched
-touch make.lock
-trap 'cleanup' EXIT
-
 # Update runner if updating is true in config 
 if [ "$UPDATE_RUNNER" = "true" ]; then
   cd ${GEOCINT_WORK_DIRECTORY}/geocint-runner; git pull --rebase --autostash || { git stash && git pull && echo 'git rebase autostash geocint-runner failed, stash and pull executed' | python scripts/slack_message.py $SLACK_CHANNEL "$SLACK_BOT_NAME" $SLACK_BOT_EMOJI; }
@@ -79,6 +75,11 @@ if [ -z "$KEEP_FILES_REGEX" ]; then
 else
   find ${GEOCINT_WORK_DIRECTORY}/geocint/ -maxdepth 1 -type f -not -regex $KEEP_FILES_REGEX -delete
 fi
+
+# create make.lock file
+touch ${GEOCINT_WORK_DIRECTORY}/geocint/make.lock
+# remove make.lock and exit after the pipeline finish
+trap 'cleanup' EXIT
 
 cd ${GEOCINT_WORK_DIRECTORY}
 # Merge geocint-runner, geocint-openstreetmap and your private repo to one folder and check duplicated files

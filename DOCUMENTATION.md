@@ -2,12 +2,14 @@
 
 * Geocint folder structure
 * Geocint open-source installation and first run guide
-	* How to create your custom part of pipeline
+    * Versions
     * Installation
     * First run
+    * How to create your custom part of pipeline
 * How geocint pipeline works
     * How start_geocint.sh works
     * How to write targets
+    * How make.lock file work
     * User schemas in the database
     * How to analyse the build time for targets
 * Make-profiler
@@ -64,19 +66,123 @@ Also when running the pipeline Makefile will create additional files:
 
 ## Geocint open-source installation and first run guide
 
-### How to create your custom part of pipeline
-Before the installation of your own geocint pipeline instance, you should create a repository to store your own part of the pipeline.
+### Versions
 
-Since geocint consists of 3 main parts (geocint-runner, geocint-openstreetmap and your custom part) to launch the pipeline
-you will need to pull from the github to your working folder the geocint-runner and geocinth-openstreetmap repositories.
-You can do this with the following commands:
-```shell
-	cd /your_working_directory/
+Geocint is an actively developed project, so in the future we could potentially add some new features that could break your pipeline (without the necessary changes on your part).
+Therefore, we kindly ask you to use the latest release branch from the geocint-runner and geocint-openstreetmap repositories if you want to be sure that your geocint instance is reliable.
+Also, don't set the UPDATE_RUNNER and UPDATE_OSM_LOGIC variables to true if you don't want to get the latest updates from branches that are enabled in your local geocint-runner and geocint-openstreetmap repositories.
+These features are available to developers. But you can use master and set the UPDATE_RUNNER and UPDATE_OSM_LOGIC variables to true if you want to make sure you always have the latest version of Geocint.
+
+### Installation
+
+1. Create a working directory for Geocint pipeline. In this directory you will store config.inc.sh file and repositories with code.
+2. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
+3. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your custom repo) to working directory. If don't have a custom repo, please see "How to create your custom part of pipeline" below.
+```bash
+    cd /your_working_directory/
 	git clone https://github.com/konturio/geocint-runner.git
-	git clone https://github.com/konturio/geocint-openstreetmap.git
+	git clone https://github.com/konturio/geocint-openstreetmap.git	
+
+    # to switch to release branch use
+	cd /your_working_directory/geocint-runner && git checkout (name of the last release branch)
+	cd /your_working_directory/geocint-openstreetmap && git checkout (name of the last release branch)
+```
+4. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
+
+* Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
+* Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
+* Add it to your [channel](https://slack.com/help/articles/202035138-Add-apps-to-your-Slack-workspace);
+* [Get the Bot User OAuth Token](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md#4-copy-oauth-access-token--use-in-azure-pipelines) n e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the SLACK_KEY variable in the file config.inc.sh. The angle brackets around your_key are in need to be removed.
+
+5. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to working directory and name config.inc.sh.
+
+Then open config.inc.sh and set the necessary values for variables. See comments at this file for details.
+
+6. Run installation:
+```shell
+	# install cmake if not exists
+	sudo apt install -y cmake
+	# move to the folder with installation Makefile
+	cd /your_working_directory/geocint-runner/scripts/
+	# run installation (you should set path to config.inc.sh file)
+	make install configuration_file=/your_working_directory/config.inc.sh
+	# reload $HOME/.bashrc file
+	source ${HOME}/.bashrc
+
+	# restart your server
+	sudo reboot
 ```
 
-Next, you need to create a folder where you will store the custom part of the pipeline (for example `geocint-custom`) and initialize the repository.
+7. Set the crontab to autostart the pipeline. 
+
+To set up your crontab to start the pipeline automatically, you need to:
+* open crontab `crontab -e`. If you are trying to use crontab for the first time, please read this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
+* add to crontab settings the next lines to run your pipeline every night at midnight (keep in mind, that you should replace "your_working_directory" with your working directory):
+
+`0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
+* add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
+
+`*/5 * * * * cd /your_working_directory/geocint/ && profile_make`
+
+* save your changes and exit.
+
+8. Install nginx and make nginx configuration. 
+
+All files and symbolic links which are necessary for geocint web-dashboard are automatically put to /your_working_directory/public_html directory, but you still need to install and configure a web server. We recomend [nginx](https://www.nginx.com/).
+
+Apache is comming by default with Ubuntu, so you may want to disable it.
+```shell
+	sudo systemctl stop apache2
+	sudo systemctl disable apache2
+```
+
+Install nginx and allow it in the Ubuntu firewall:
+```shell
+	sudo apt update
+	sudo apt install nginx
+	sudo ufw allow "Nginx Full"
+```
+
+Create/adjust nginx configuration, e.g. the default one:
+```
+	sudo nano /etc/nginx/sites-available/default
+```
+location section should look like this
+
+```
+    location / {
+        access_log /home/gis/domlogs/access.log combined_ssl buffer=4k flush=5s;
+        error_log /home/gis/domlogs/error.log warn;
+
+        root /your_working_directory/public_html;
+        try_files $uri $uri/ =404;
+```
+**root** should point to public_html subfolder in your geocint working folder, 
+*/your_working_directory/public_html* in this example;
+
+For more details on nginx setup refer to the [manual](http://nginx.org/en/docs/beginners_guide.html).
+
+Test configuration and run nginx:
+```shell
+	sudo nginx -t
+	sudo systemctl start nginx
+```
+
+### First run
+
+To automatically start the full pipeline, set the preferred time in the crontab installation.
+For example, to run the pipeline every night at midnight set
+
+`0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
+
+if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "/your_working_directory/" with the directory where you cloned 3 repositories (see point 2 for more information):
+```shell
+bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt
+```
+
+### How to create your custom part of pipeline
+
+You need to create a folder where you will store the custom part of the pipeline (for example `geocint-custom`) and initialize the repository.
 The custom part is a git repository (folder) with a set of files necessary to execute the pipeline.
 ```shell
 	mkdir /your_working_directory/geocint-custom
@@ -138,107 +244,14 @@ data/out/hello_world.txt: data/out ## Create a simple txt file and say Hello Wor
 
 ```
 
-### Installation
-
-1. Create a new user with sudo permissions or use the existing one (the default user is "gis"). Keep in mind that the best practice is to use this username for creating a Postgres role and database.
-2. Clone 3 repositories (geocint-runner, geocint-openstreetmap, your custom repo) to working directory.
-3. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
-
-* Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
-* Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
-* Add it to your [channel](https://slack.com/help/articles/202035138-Add-apps-to-your-Slack-workspace);
-* [Get the Bot User OAuth Token](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md#4-copy-oauth-access-token--use-in-azure-pipelines) n e.g. 'xoxb-111-222-xxxxx'. Bot OAuth Token will be stored in the SLACK_KEY variable in the file config.inc.sh. The angle brackets around your_key are in need to be removed.
-
-4. Copy [config.inc.sh.sample](config.inc.sh.sample) from geocint-runner to working directory and name config.inc.sh.
-
-Then open config.inc.sh and set the necessary values for variables. See comments at this file for details.
-
-5. Run installation:
-```shell
-	# install cmake if not exists
-	sudo apt install -y cmake
-	# move to the folder with installation Makefile
-	cd /your/working/directory/geocint-runner/scripts/
-	# run installation (you should set path to config.inc.sh file)
-	make install configuration_file=/your/working/directory/config.inc.sh
-	# reload $HOME/.bashrc file
-	source ${HOME}/.bashrc
-```
-
-6. Set the crontab to autostart the pipeline. 
-
-To set up your crontab to start the pipeline automatically, you need to:
-* open crontab `crontab -e`. If you are trying to use crontab for the first time, please read this [guide](https://www.howtogeek.com/101288/how-to-schedule-tasks-on-linux-an-introduction-to-crontab-files)
-* add to crontab settings the next lines to run your pipeline every night at midnight (keep in mind, that you should replace "your_working_directory" with your working directory):
-
-`0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
-* add the following line to regenerate make.svg every 5 minutes; make.svg is a file with a stored graphical representation of graph with dependencies of targets (gray targets - not built, blue - successfully built, red - not built due to the error)
-
-`*/5 * * * * cd /your_working_directory/geocint/ && profile_make`
-
-* save your changes and exit.
-
-7. Install nginx and make nginx configuration. 
-
-All files and symbolic links which are necessary for geocint web-dashboard are automatically put to /your_working_directory/public_html directory, but you still need to install and configure a web server. We recomend [nginx](https://www.nginx.com/).
-
-Apache is comming by default with Ubuntu, so you may want to disable it.
-```shell
-	sudo systemctl stop apache2
-	sudo systemctl disable apache2
-```
-
-Install nginx and allow it in the Ubuntu firewall:
-```shell
-	sudo apt update
-	sudo apt install nginx
-	sudo ufw allow "Nginx Full"
-```
-
-Create/adjust nginx configuration, e.g. the default one:
-```
-	sudo nano /etc/nginx/sites-available/default
-```
-location section should look like this
-
-```
-    location / {
-        access_log /home/gis/domlogs/access.log combined_ssl buffer=4k flush=5s;
-        error_log /home/gis/domlogs/error.log warn;
-
-        root /your_working_directory/public_html;
-        try_files $uri $uri/ =404;
-```
-**root** should point to public_html subfolder in your geocint working folder, 
-*/your_working_directory/public_html* in this example;
-
-For more details on nginx setup refer to the [manual](http://nginx.org/en/docs/beginners_guide.html).
-
-Test configuration and run nginx:
-```shell
-	sudo nginx -t
-	sudo systemctl start nginx
-```
-
-### First run
-
-To automatically start the full pipeline, set the preferred time in the crontab installation.
-For example, to run the pipeline every night at midnight set
-
-`0 0 * * * cd /your_working_directory && mkdir -p geocint && /bin/bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt`
-
-if you want to run the pipeline manually, then run the next line, but keep in mind, that you should replace "/your_working_directory/" with the directory where you cloned 3 repositories (see point 2 for more information):
-```shell
-bash /your_working_directory/geocint-runner/start_geocint.sh > /your_working_directory/geocint/log.txt
-```
-
 ## How geocint pipeline works
 
 ### How start_geocint.sh works
 
-After start_geocint.sh is run, it imports the variables from the configuration file /your_working_directory//config.inc.sh. 
-It will then check the update flags in /your_working_directory/config.inc.sh and git pull the repositories that have the flag set to “true”. 
-Next, it will merge geocint-runner, geocint-openstreetmap and your custom repository into one folder /your_working_directory/geocint.
+After start_geocint.sh is run, it imports the variables from the configuration file /your_working_directory/config.inc.sh. 
+It will then check the update flags in /your_working_directory/config.inc.sh and git pull the repositories that have the flag set to “true”.
+Then bash will check if /your_working_directory/geocint/make.lock file exists.
+If /your_working_directory/geocint/make.lock file not exists bash will merge geocint-runner, geocint-openstreetmap and your custom repository into one folder /your_working_directory/geocint.
 After these events are completed, start_geocint.sh will launch the targets specified in the $RUN_TARGETS variable. The last step is to create/update the make.svg file containing the dependency graph.
 
 ### How to write targets
@@ -285,6 +298,11 @@ data/out/output.geojson.gz: data/in/some.tiff db/table/table_from_csv db/table/t
 ```
 You can read more about target's dependencies(prerequisites) in the official [GNU Make manual](https://www.gnu.org/software/make/manual/make.html#Prerequisite-Types)
 
+### How make.lock file work
+
+`/your_working_directory/geocint/make.lock` is a special temporary file that is created automatically after the pipeline starts and is deleted after the pipeline ends.
+Bash uses the make.lock file to avoid duplicating a running pipeline.
+
 ### User schemas in database
 
 User schemas can be used for a separate pipeline and dev data.
@@ -314,11 +332,20 @@ find /your_working_directory/geocint/logs -type f -regex ".*/db/table/osm_admin_
 
 ## Make-profiler
 
-Make-profiler is used as a linter and preprocessor for Makefile that outputs a network diagram of what is getting built, when, and why. 
-The output chart (by default make.svg) allows seeing what went wrong and quickly getting to logs. https://github.com/konturio/make-profiler
-
-After the pipeline run, make_profiler will create a make.svg file and make_profile.db.
-Make-profile features:
+Make-profiler is used as a linter and preprocessor for Makefile that outputs a network diagram and an html report of what is getting built, when, and why. 
+The output chart (by default make.svg) & html report allows seeing what went wrong and quickly getting to logs. https://github.com/konturio/make-profiler  
+After the pipeline run, make_profiler will create make.svg, make_profile.db & a json file to be used on report page.  
+Both svg file and report can be reached on web from http://your_ip_or_domain/make.svg & http://your_ip_or_domain/  
+While report json generation make_profile.db, logs and relevant folders are checked and result json file is created including last pipeline status and information about every target. This json is used on report page.  
+  
+Make-profile report features:
+- Total number of targets finished, in progress and failed is reported.    
+- Targets finished, in progress and failed can be seen on white, yellow and red colors.   
+- Tasks can be filtered and only desired ones can be seen.  
+- Status duration, last completed date, status date & logs about task can be reached for every task.  
+- Report can be sorted with any of task information.  
+  
+Make-profile svg features:
 - SVG build overview;
 - Critical Path is highlighted;
 - Inline pictures-targets into build overview;
