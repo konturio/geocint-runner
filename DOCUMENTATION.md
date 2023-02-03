@@ -128,15 +128,15 @@ To set up your crontab to start the pipeline automatically, you need to:
 
 8. Install nginx and make nginx configuration. 
 
-All files and symbolic links which are necessary for geocint web-dashboard are automatically put to /your_working_directory/public_html directory, but you still need to install and configure a web server. We recomend [nginx](https://www.nginx.com/).
+All files and symbolic links which are necessary for geocint web-dashboard are automatically put to /your_working_directory/public_html directory, but you still need to install and configure a web server. We recommend [nginx](https://www.nginx.com/).
 
-Apache is comming by default with Ubuntu, so you may want to disable it.
+Apache is installed by default with Ubuntu, so you may want to disable it.
 ```shell
 	sudo systemctl stop apache2
 	sudo systemctl disable apache2
 ```
 
-Install nginx and allow it in the Ubuntu firewall:
+Install nginx and allow it to be used in the Ubuntu firewall:
 ```shell
 	sudo apt update
 	sudo apt install nginx
@@ -147,7 +147,7 @@ Create/adjust nginx configuration, e.g. the default one:
 ```
 	sudo nano /etc/nginx/sites-available/default
 ```
-location section should look like this
+the location section should look like this
 
 ```
     location / {
@@ -157,7 +157,7 @@ location section should look like this
         root /your_working_directory/public_html;
         try_files $uri $uri/ =404;
 ```
-**root** should point to public_html subfolder in your geocint working folder, 
+**root** should point to the public_html subfolder in your geocint working folder, 
 */your_working_directory/public_html* in this example;
 
 For more details on nginx setup refer to the [manual](http://nginx.org/en/docs/beginners_guide.html).
