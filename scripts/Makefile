@@ -73,6 +73,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database: ${GEOCINT_WORK_D
 	rm -f DB_COUNT
 	sudo -u postgres psql -q -X -t -c "select count(*) FROM pg_database WHERE datname = '${PGDATABASE}'" | xargs echo > DB_COUNT
 	if [ $$(cat DB_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGUSER};"; fi
+	sudo -u postgres psql -c "ALTER DATABASE ${PGDATABASE} SET datestyle TO 'ISO, DMY';"
 	if [ 0 -lt $$(cat DB_COUNT) ]; then echo "database ${PGDATABASE} already exists. Skip creation."; fi
 	rm -f DB_COUNT
 	touch $@
