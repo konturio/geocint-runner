@@ -87,7 +87,8 @@ These features are available to developers. But you can use master and set the U
 	cd /your_working_directory/geocint-runner && git checkout (name of the last release branch)
 	cd /your_working_directory/geocint-openstreetmap && git checkout (name of the last release branch)
 ```
-4. The geocint pipeline should [send messages](https://api.slack.com/messaging/sending) to the Slack channel. To set slack integration you should:
+4. The geocint pipeline can [send messages](https://api.slack.com/messaging/sending) to the Slack channel.
+The Slack integration is an optional part, you can safely skip it and add it later if needed. To set slack integration you should:
 
 * Create a [channel](https://slack.com/help/articles/201402297-Create-a-channel);
 * Generate a Slack App and [configure it](https://github.com/kasunkv/slack-notification/blob/master/generate-slack-token.md);
