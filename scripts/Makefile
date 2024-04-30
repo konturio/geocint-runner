@@ -9,7 +9,7 @@ export SLACK_KEY = $(shell sed -n -e '/^SLACK_KEY/p' ${configuration_file} | cut
 export GEOCINT_WORK_DIRECTORY = $(shell sed -n -e '/^GEOCINT_WORK_DIRECTORY/p' ${configuration_file} | cut -d "=" -f 2)
 export CUSTOM_PART_FOLDER_NAME = $(shell sed -n -e '/^CUSTOM_PART_FOLDER_NAME/p' ${configuration_file} | cut -d "=" -f 2)
 
-
+echo 'export GEOCINT_WORK_DIRECTORY=${GEOCINT_WORK_DIRECTORY}' >> ${HOME}/.bashrc
 
 # -------------------- PREPARATIONS BLOCK -----------------------------------
 
