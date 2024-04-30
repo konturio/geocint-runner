@@ -39,6 +39,7 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer: ${GEOCINT_WORK_
 
 
 ${GEOCINT_WORK_DIRECTORY}/geocint/installation/private_installer: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer ## installs aws cli and system links to public html for the UI
+bash ${GEOCINT_WORK_DIRECTORY}/${CUSTOM_PART_FOLDER_NAME}/install.sh || { echo "Error during installation: $(cat ${GEOCINT_WORK_DIRECTORY}/logs/install.log)"; exit 1; }
 	bash ${GEOCINT_WORK_DIRECTORY}/${CUSTOM_PART_FOLDER_NAME}/install.sh || echo 'install.sh returned an error, check logs for more infornation'
 	touch $@
 
