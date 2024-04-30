@@ -1,11 +1,6 @@
 # to install geocint just run 
 # make install configuration_file=/path/to/your/config/file/config.inc.sh
 
-# Add here export for every varible from configuration file that you are going to use in targets
-export PGDATABASE = $(shell sed -n -e '/^PGDATABASE/p' ${configuration_file} | cut -d "=" -f 2)
-export PGUSER = $(shell sed -n -e '/^PGUSER/p' ${configuration_file} | cut -d "=" -f 2)
-export PGPASSWORD = $(shell sed -n -e '/^PGPASSWORD/p' ${configuration_file} | cut -d "=" -f 2)
-export INSTALL_POSTGRESQL_EXTENSIONS = $(shell sed -n -e '/^INSTALL_POSTGRESQL_EXTENSIONS/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_CHANNEL = $(shell sed -n -e '/^SLACK_CHANNEL/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_NAME = $(shell sed -n -e '/^SLACK_BOT_NAME/p' ${configuration_file} | cut -d "=" -f 2)
 export SLACK_BOT_EMOJI = $(shell sed -n -e '/^SLACK_BOT_EMOJI/p' ${configuration_file} | cut -d "=" -f 2)
@@ -14,7 +9,7 @@ export SLACK_KEY = $(shell sed -n -e '/^SLACK_KEY/p' ${configuration_file} | cut
 export GEOCINT_WORK_DIRECTORY = $(shell sed -n -e '/^GEOCINT_WORK_DIRECTORY/p' ${configuration_file} | cut -d "=" -f 2)
 export CUSTOM_PART_FOLDER_NAME = $(shell sed -n -e '/^CUSTOM_PART_FOLDER_NAME/p' ${configuration_file} | cut -d "=" -f 2)
 
-PG_EXTENSIONS_LIST = $(shell echo "${INSTALL_POSTGRESQL_EXTENSIONS}" | tr "," "\n")
+
 
 # -------------------- PREPARATIONS BLOCK -----------------------------------
 
@@ -42,15 +37,8 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer: ${GEOCINT_WORK_
 	bash ${GEOCINT_WORK_DIRECTORY}/geocint-runner/runner-install.sh || echo 'runner-install.sh returned an error, check logs for more infornation'
 	touch $@
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/openstreetmap_installer: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer ## install dependencies of openstreetmap part
-	bash ${GEOCINT_WORK_DIRECTORY}/geocint-openstreetmap/openstreetmap-install.sh || echo 'openstreetmap-install.sh returned an error, check logs for more infornation'
-	touch $@
 
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/h3_pg_installation: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/openstreetmap_installer ## install h3_pg
-	sudo pgxn install h3
-	touch $@
-
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/private_installer: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/h3_pg_installation ## install dependencies of openstreetmap part
+${GEOCINT_WORK_DIRECTORY}/geocint/installation/private_installer: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/runner_installer ## installs aws cli and system links to public html for the UI
 	bash ${GEOCINT_WORK_DIRECTORY}/${CUSTOM_PART_FOLDER_NAME}/install.sh || echo 'install.sh returned an error, check logs for more infornation'
 	touch $@
 
@@ -59,36 +47,6 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished: ${GE
 	touch $@
 
 
-# ------------------------ DB configuration block ----------------------------
-
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_user: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/installation_block_finished ## create postgresql user
-	rm -f USER_COUNT
-	sudo -u postgres psql -q -X -t -c "select count(*) from pg_roles WHERE rolname = '${PGUSER}'" | xargs echo > USER_COUNT
-	if [ $$(cat USER_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE ROLE ${PGUSER} WITH SUPERUSER LOGIN ENCRYPTED PASSWORD '${PGPASSWORD}';"; fi
-	if [ 0 -lt $$(cat USER_COUNT) ]; then echo "role ${PGUSER} already exists. Skip creation."; fi
-	rm -f USER_COUNT
-	touch $@
-	
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_user ## create postgresql db
-	rm -f DB_COUNT
-	sudo -u postgres psql -q -X -t -c "select count(*) FROM pg_database WHERE datname = '${PGDATABASE}'" | xargs echo > DB_COUNT
-	if [ $$(cat DB_COUNT) -lt 1 ]; then sudo -u postgres psql -c "CREATE DATABASE ${PGDATABASE} WITH OWNER ${PGUSER};"; fi
-	sudo -u postgres psql -c "ALTER DATABASE ${PGDATABASE} SET datestyle TO 'ISO, DMY';"
-	if [ 0 -lt $$(cat DB_COUNT) ]; then echo "database ${PGDATABASE} already exists. Skip creation."; fi
-	rm -f DB_COUNT
-	touch $@
-	
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_extensions: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_database ## create postgresql extensions
-	echo "Create PostgreSQL extensions:"
-	echo ${PG_EXTENSIONS_LIST}	
-	for i in $(PG_EXTENSIONS_LIST); do \
-		psql -c "CREATE EXTENSION IF NOT EXISTS $$i ;"; \
-	done
-	touch $@
-
-${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/create_extensions ## send message that database initialisation step finished successfully
-	echo "Database initialisation step finished successfully"
-	touch $@
 
 # ------------------------ WEB Dashboard installation block ----------------------------
 
@@ -116,5 +74,5 @@ ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished: ${G
 
 # ------------------------ MANAGE BLOCK ---------------------------------------
 
-install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/database_block_finished ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished ## Target to run Geocint pipeline installation
+install: ${GEOCINT_WORK_DIRECTORY}/geocint/installation/web_dashboard_block_finished ## Target to run Geocint pipeline installation
 	echo "Geocint pipeline successfully installed"
