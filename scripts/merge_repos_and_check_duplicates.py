@@ -36,7 +36,7 @@ def get_files_list(directory, ignore_list):
 
 def get_config_variable(config_name, variable, delimiter):
     ignored_files = []
-    with open(config_name, "r") as config:
+    with open(config_name, "r", encoding="utf-8") as config:
         for line in config:
             if search(variable, line):
                 ignored_files = (
